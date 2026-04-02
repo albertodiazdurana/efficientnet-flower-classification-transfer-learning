@@ -1,0 +1,252 @@
+Intro
+Welcome Back!
+notion image
+We all know how crucial a strong project portfolio is when it comes to employment. Employers pay the most attention to the projects candidates have completed, as real-world experience often speaks louder than words. Having a collection of up-to-date, industry-relevant projects can set you apart from the competition and give you a significant advantage.
+So, what do you need?
+🚫 Love (although everybody needs it!)
+✅ More hands-on experience that you can showcase to potential employers! And that’s exactly what we’ll focus on next.
+We’ll introduce a selection of projects for you to choose from. You can work on one or more, depending on your availability and interest. However, we strongly recommend completing at least 1 project from the list to strengthen your portfolio.
+🔥
+Our project cases cover a variety of industries and problem domains. Each case includes a brief summary to help you quickly understand its scope. Once you’ve chosen a project, you’ll find a more detailed description on its dedicated project page.
+So, are you willing to learn what our projects are going to be about? Lets dive deeper into the industries and projects next!
+ How to Get Started
+Let’s now discuss in a granular manner what are our TO-DOs to get started with a desired industry and a project. To make everything transparent, we prepared for you a step-by-step guide to follow. It comes below!
+Here’s What to do Next:
+1️⃣Quickly examine a list of industries and projects below. This is what is available to you:
+🌐 E-commerce
+Case: Predicting Product Delivery Time for an Electronics Store
+🚙 Automotive
+Case: Estimating Car Prices for a Local Dealership
+🍱 Hospitality & Service
+Case: Enhancing Restaurant Service Through Sentiment Analysis of Customer Reviews
+🌷 Information Technology
+Case: Automating Flower Classification for a Start-up Using Deep Learning 
+💹 Finance
+Case: Forecasting Currency Exchange Rates for Banking Operations
+2️⃣Select an industry and a project of your choice.
+3️⃣Open the corresponding project page (they come next) to explore the details. There you will understand the business problem, and familiarize yourself with the general project guidelines.
+4️⃣ Review the rubric, so you know what kind of requirements your project must meet, no matter what kind of an industry and a project you select. The rubric is provided to you in the very last lesson.
+5️⃣ Once you've chosen a project, your goal is to complete it end-to-end. Use the rubric and the general project guidelines (from the project page) as instructions that you need to go over to solve the problem at hand.
+Where Am I Going to Work?
+All your work will take place in Google Colab. To get started, create your own Google Colab workspace by clicking the "New Notebook" button. Here's what it looks like:
+notion image
+Once your notebook is set up, use it to complete the project.
+With this in mind, let’s get started! 🚀
+
+🌐 Project: E-commerce. Predicting Product Delivery Time for an Electronics Store
+Industry Overview & Business Context
+notion image
+In today’s fast-paced e-commerce industry, delivery speed is a critical factor in customer satisfaction and business success. Customers expect timely deliveries, and delays can lead to negative reviews, lost trust, and reduced repeat purchases. For an international electronics retailer, ensuring accurate delivery time predictions can optimize logistics, reduce costs, and improve the overall customer experience.
+Currently, the company faces challenges in predicting which orders are at risk of late delivery. By leveraging machine learning, they aim to proactively identify such risks, improve logistics planning, and ultimately enhance customer satisfaction.
+Project Scope & Dataset
+The company has collected data on 10,999 transactions across 12 key variables related to order fulfillment.The data contains the following information:
+ID: ID Number of Customers.
+Warehouse block: The Company have big Warehouse which is divided in to block such as A,B,C,D,E.
+Mode of shipment:The Company Ships the products in multiple way such as Ship, Flight and Road.
+Customer care calls: The number of calls made from enquiry for enquiry of the shipment.
+Customer rating: The company has rated from every customer. 1 is the lowest (Worst), 5 is the highest (Best).
+Cost of the product: Cost of the Product in US Dollars.
+Prior purchases: The Number of Prior Purchase.
+Product importance: The company has categorized the product in the various parameter such as low, medium, high.
+Gender: Male and Female.
+Discount offered: Discount offered on that specific product.
+Weight in gms: It is the weight in grams.
+Reached on time: It is the target variable, where 1 Indicates that the product has NOT reached on time and 0 indicates it has reached on time.
+The dataset can be downloaded from here.
+The goal is to analyze these variables and build a predictive model that determines whether an order will arrive on time or not.
+Key Performance Indicators (KPIs)
+Success in this project will be measured by:
+Prediction Accuracy: How well the model classifies on-time vs. delayed deliveries.
+Precision & Recall: Ensuring minimal false negatives (i.e., missed late deliveries).
+Business Impact: Potential reduction in late deliveries by optimizing logistics based on model insights.
+Exploratory Data Analysis (EDA) Guidelines
+To gain deeper insights, consider exploring:
+Customer Ratings & Delivery Performance: Do higher-rated products tend to arrive on time?
+Shipping Mode & Delivery Times: Are certain shipment methods more prone to delays?
+Impact of Discounts & Product Importance: Does discounting or product priority influence delivery times?
+Success Factors & Best Practices
+Here are the factors and practices that are essential for a successful project:
+Data Cleaning: Handling missing values and inconsistencies.
+Feature Engineering: Identifying key variables that impact delivery times.
+Model Selection: Testing different machine learning models for optimal performance.
+Business Interpretation: Translating model insights into actionable strategies for improving logistics.
+By the end of this project, you should get a robust predictive model and gained valuable experience in applying machine learning to real-world e-commerce challenges.
+Good luck!
+
+🚙 Project: Automotive. Estimating Car Prices for a Local Dealership
+Industry Overview & Business Context
+notion image
+The used car market is highly dynamic, influenced by factors such as vehicle condition, mileage, brand reputation, and economic trends. For local car dealerships, accurately estimating the price of a car is crucial for maintaining competitive pricing, maximizing profit margins, and ensuring quick sales.
+Currently, a local dealership struggles with inconsistent pricing, leading to cars being undervalued (resulting in lost revenue) or overpriced (leading to prolonged inventory holding costs). By leveraging machine learning, the dealership aims to build a predictive pricing model that estimates a car’s market value based on its features. This will enable data-driven pricing strategies, helping the business optimize profitability while offering fair market prices to customers.
+Project Scope & Dataset
+The dealership has compiled data on car listings collected from online sources at the beginning of 2019. The dataset includes various attributes that influence a car’s price, such as make, model, year, mileage, and fuel type. The goal is to analyze these variables and develop a predictive model that estimates the price of a car based on its characteristics.
+Dataset Details
+The dataset contains the following features:
+Make – Manufacturer of the car (e.g., Toyota, Ford, BMW).
+Model – Specific model of the car.
+Price (USD) – Price in US dollars (target variable).
+Year – Year of production.
+Condition – Condition at the time of sale (e.g., used, for parts, with mileage).
+Mileage – Total distance traveled, measured in kilometers.
+Fuel Type – Type of fuel used (e.g., electric, petrol, diesel).
+Volume – Engine volume (in liters).
+Color – Exterior color of the car.
+Transmission – Type of transmission (e.g., manual, automatic).
+Drive Unit – Drivetrain type (e.g., FWD, RWD, AWD).
+Segment – Car segment/category (this feature was collected manually and may contain inaccuracies).
+The dataset can be downloaded from here.
+Key Performance Indicators (KPIs)
+The success of this project will be measured by:
+Mean Absolute Error (MAE) / Root Mean Squared Error (RMSE): Ensuring minimal pricing deviations.
+Business Impact: Improvement in dealership pricing efficiency and inventory turnover rates.
+Exploratory Data Analysis (EDA) Guidelines
+To gain valuable insights, consider exploring:
+Brand Influence on Pricing: Which manufacturers tend to have higher or lower price ranges?
+Mileage & Depreciation Trends: How does an increase in mileage impact resale value?
+Car Segments & Price Patterns: Do luxury cars consistently retain higher values compared to economy models?
+Success Factors & Best Practices
+To build a high-quality pricing model, follow these best practices:
+Data Cleaning & Feature Engineering: Handle missing values, detect anomalies, and create new features where relevant.
+Model Selection & Evaluation: Compare regression models such as Linear Regression, Decision Trees, and Gradient Boosting to determine the best-performing model.
+Interpretability & Business Application: Ensure that pricing recommendations align with dealership expectations and market trends.
+By the end of this project, students will have developed a data-driven pricing model, gaining hands-on experience in machine learning applications within the automotive industry.
+Good luck!
+ 
+
+🍱 Project: Hospitality & Service. Enhancing Restaurant Service Through Sentiment Analysis of Customer Reviews
+Industry Overview & Business Context
+notion image
+In the restaurant industry, customer satisfaction is a key driver of success. A single negative review can influence potential diners, while positive feedback builds trust and attracts more customers. With the rise of online reviews, restaurant owners need data-driven insights to understand customer sentiment and improve service accordingly.
+A restaurant has collected a dataset of customer reviews to analyze sentiment and identify patterns that can help improve the overall dining experience. By leveraging sentiment analysis, the restaurant aims to gain deeper insights into customer satisfaction, address negative feedback proactively, and enhance service quality.
+Project Scope & Dataset
+The dataset contains customer reviews along with a binary sentiment label indicating whether the customer liked or did not like both the food and the overall experience. The goal of this project is to build a machine learning model that accurately predicts the sentiment of a given review.
+Dataset Details
+The dataset consists of two columns:
+Review – The actual text of the review written by a customer.
+Liked – A binary target variable:
+1: The customer liked the food.
+0: The customer did not like the food.
+The dataset can be downloaded from here.
+Key Performance Indicators (KPIs)
+Success in this project will be measured by:
+Model Accuracy: The percentage of correct sentiment predictions.
+Precision & Recall: Ensuring a balanced classification, especially for negative reviews.
+Business Impact: How well the model helps the restaurant identify and address service issues.
+Exploratory Data Analysis (EDA) Guidelines
+To gain deeper insights, consider analyzing:
+Review Length & Sentiment: Are longer reviews more likely to be negative or positive?
+Frequent Keywords in Positive vs. Negative Reviews: Do certain words signal dissatisfaction (e.g., "cold," "slow," "expensive") while others indicate satisfaction (e.g., "delicious," "friendly," "cozy")?
+Mixed Sentiments: Are there reviews containing both positive and negative aspects, and how should they be classified?
+Success Factors & Best Practices
+To build an effective sentiment analysis model, consider the following:
+Text Preprocessing: Cleaning and tokenizing text, removing stopwords, and handling misspellings.
+Feature Engineering: Using techniques like TF-IDF, word embeddings, or sentiment lexicons to improve model performance.
+Model Selection: Comparing traditional machine learning models like Logistic Regression or Decision Tree
+Business Application: Interpreting insights to suggest actionable improvements, such as menu adjustments, staff training, or service optimizations.
+By the end of this project, you will build a real-world sentiment analysis model, helping the restaurant turn customer feedback into valuable business strategies.
+Good luck!
+
+🌷 Project: Information Technology. Automating Flower Classification for a Start-up Using Deep Learning
+notion image
+Industry Overview & Business Context
+With advancements in computer vision and deep learning, automated image classification is transforming industries such as agriculture, e-commerce, and environmental research. Start-ups focused on plant identification, smart gardening, or online flower retailing can leverage AI-powered image recognition to classify flowers with high accuracy.
+A start-up company wants to develop a flower classification system that can automatically identify different flower species from images. This technology can be used for automated cataloging, mobile plant identification apps, or personalized recommendations in online flower stores.
+To achieve this, the company will utilize the Oxford Flowers 102 dataset, a widely used benchmark in image classification tasks. The dataset contains images of 102 flower species, each with varying conditions such as lighting, angles, and backgrounds.
+Project Scope & Dataset
+The goal is to build a machine learning model capable of classifying images of flowers into their respective species. The dataset provides:
+102 flower categories with diverse species.
+40 to 258 images per category, leading to class imbalance challenges.
+Training and test splits for model evaluation.
+Images with varying sizes, lighting conditions, and backgrounds, making classification more challenging.
+Dataset Access & Loading
+The dataset can be accessed using TensorFlow Datasets (TFDS):
+Copied code
+to clipboard
+1234567891011
+# import TensorFlow Datasets (tfds)
+import tensorflow_datasets as tfds
+
+# Load the Flowers dataset
+dataset, dataset_info = tfds.load('oxford_flowers102',
+								with_info=True,
+								as_supervised=True
+								)
+test_set = dataset['test']
+training_set = dataset['train']
+
+Note that when we use the TFDS as a source of data, here is how we do preprocessing:
+Copied code
+to clipboard
+123456789101112131415161718192021222324252627282930313233343536
+import tensorflow as tf
+
+# setting up a desired image size
+image_size = 224
+
+# creating a function that does preprocessing
+def format_image(image, label):
+  image = tf.image.resize(image, (image_size, image_size))/255.0
+  return image, label
+
+
+One last note! Since labels for this classification problem are provided by TFDS as encoded vectors, set loss='sparse_categorical_crossentropy' when compiling your model.
+Key Performance Indicators (KPIs)
+Success in this project will be measured by:
+Classification Accuracy: How well the model distinguishes between different flower species.
+Precision & Recall: Ensuring minimal misclassification, especially for similar-looking flowers.
+Model Generalization: Performance across varying lighting conditions, backgrounds, and image qualities.
+Exploratory Data Analysis (EDA) Guidelines
+To understand the dataset better, consider analyzing:
+Class Imbalance: Are certain flower species overrepresented or underrepresented?
+Visual Similarities: Do some flower categories share colors or shapes, making them harder to classify?
+Data Augmentation Needs: How does lighting and background variation impact classification?
+Success Factors & Best Practices
+To build a high-performing image classification model, follow these best practices:
+Data Augmentation: Use techniques like rotation, zoom, and color adjustments to improve model robustness.
+Transfer Learning: Leverage pre-trained CNNs (e.g., ResNet, EfficientNet) to enhance accuracy with limited data.
+Hyperparameter Tuning: Optimize learning rates, batch sizes, and architectures for improved performance.
+Business Application: Consider deployment strategies such as a mobile app for flower recognition or an e-commerce integration for automated tagging of flower products.
+By the end of this project, you will have built a real-world image classification model, gaining valuable experience in deep learning, computer vision, and AI-driven applications for businesses.
+Good luck!
+
+💹 Project: Finance. Forecasting Currency Exchange Rates for Banking Operations
+Industry Overview & Business Context
+notion image
+In the fast-moving world of finance and banking, accurate currency exchange rate forecasting is crucial for risk management, investment strategies, and international transactions. Banks rely on exchange rate predictions to:
+Optimize currency reserves and reduce exposure to fluctuations.
+Support international trade by providing businesses with better hedging strategies.
+Assist investment banking teams in making informed trading decisions.
+A major banking institution is looking to enhance its currency forecasting capabilities using machine learning. By accurately predicting exchange rates, the bank can improve its financial planning, manage foreign exchange (forex) risks, and offer competitive rates to clients.
+This project focuses on forecasting exchange rates for:
+Singapore Dollar (SGD) to US Dollar (USD)
+Chinese Yuan (CNY) to US Dollar (USD)
+Project Scope & Dataset
+The dataset contains historical exchange rates for SGD/USD and CNY/USD over a period of time. Understanding historical trends, seasonality, and volatility is key to building a robust forecasting model.
+Dataset Details
+Here are the columns that the dataset has:
+DATE – The date corresponding to the exchange rate.
+SINGAPORE - SINGAPORE DOLLAR/US$ – The exchange rate of 1 Singapore Dollar (SGD) in US Dollars (USD).
+CHINA - YUAN/US$ – The exchange rate of 1 Chinese Yuan (CNY) in US Dollars (USD).
+The dataset can be downloaded from here.
+Key Performance Indicators (KPIs)
+Success in this project will be measured by:
+Forecasting Accuracy: How closely the predicted exchange rates match actual values (using RMSE, MAE).
+Trend Identification: The model’s ability to capture long-term movements.
+Volatility Prediction: Identifying high-risk periods for better decision-making.
+Time Horizon Performance: Measuring accuracy across different forecasting periods (daily, weekly, monthly).
+Exploratory Data Analysis (EDA) Guidelines
+Before building a predictive model, consider the following EDA steps:
+Trend Analysis: Are exchange rates following long-term increasing or decreasing trends?
+Seasonality Detection: Are there recurring patterns in daily, weekly, or monthly movements?
+Correlation Study: Do SGD/USD and CNY/USD exchange rates move together or behave independently?
+Volatility Examination: Are there periods of high fluctuation that could impact predictions?
+Success Factors & Best Practices
+To develop an effective exchange rate forecasting model, follow these best practices:
+Feature Engineering: Incorporate lag variables, moving averages, and external economic indicators.
+Model Selection: Compare statistical models (ARIMA, SARIMA) and machine learning approaches (like XGBoost).
+Hyperparameter Optimization: Tune model parameters for improved accuracy.
+Risk Assessment: Evaluate the impact of incorrect predictions on financial decisions.
+Business Interpretation: Translate model insights into actionable strategies for banking operations.
+By the end of this project, you’ll gain hands-on experience in time-series forecasting, financial modeling, and data-driven decision-making for the banking industry.
+Good luck!
+
