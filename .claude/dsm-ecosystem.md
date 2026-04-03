@@ -7,5 +7,5 @@ This file is gitignored and instance-specific.
 
 | Name | Path | Description | Mirror |
 |------|------|-------------|--------|
-| dsm-central | /home/berto/dsm-take-ai-bite | Hub repository | - |
-| portfolio | {UPDATE THIS PATH} | Portfolio project | - |
+| portfolio | /home/berto/dsm-data-science-portfolio-working-folder/ | Portfolio project | - |
+| dsm central | /home/berto/dsm-agentic-ai-data-science-methodology/ | Hub repository | - |

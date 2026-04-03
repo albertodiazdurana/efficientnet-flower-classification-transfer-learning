@@ -1,4 +1,4 @@
-@/home/berto/dsm-take-ai-bite/DSM_0.2_Custom_Instructions_v1.1.md
+@/home/berto/dsm-agentic-ai-data-science-methodology/DSM_0.2_Custom_Instructions_v1.1.md
 
 <!-- BEGIN DSM_0.2 ALIGNMENT - do not edit manually, managed by /dsm-align -->
 ## DSM Alignment (managed by /dsm-align)
@@ -30,6 +30,8 @@
 Use "," instead of "—" for connecting phrases in any language.
 
 ### Notebook Collaboration Protocol (reinforces inherited protocol)
+- Each cell is copied and pasted by the user
+- Generate the content of each cell so that it can be copied with a click
 - Generate ONE cell at a time, wait for user to run and share output
 - Number each cell with a comment (e.g., `# Cell 1`)
 - "Continue" = generate next cell; "Generate all cells" = explicit batch override
@@ -42,8 +44,38 @@ Use "," instead of "—" for connecting phrases in any language.
 <!-- END DSM_0.2 ALIGNMENT -->
 
 # Project: Advanced DS and AI Portfolio Projects
-Domain: Data Science / AI / Application Development
+Domain: Data Science / AI / Deep Learning
 
-## Project-Specific Instructions
+## Current Focus
 
-(Add project-specific instructions here)
+Flower Classification (Oxford Flowers 102) — deep learning image classification
+for a startup use case. Sprint plan: `dsm-docs/plans/sprint-1-plan.md`.
+
+## Environment
+
+- **Local GPU:** Quadro T1000, 4GB VRAM (CUDA 12.8)
+- **Python:** 3.10.12, venv at `.venv/`
+- **Framework:** TensorFlow 2.21, Keras 3.12
+- **Notebook:** `notebooks/flower-classification.ipynb`
+- **Kernel:** `flower_classification`
+
+## Hardware Constraints
+
+- EfficientNetB0 at 224×224, batch 16 fits locally
+- EfficientNetB3+ or 300×300 resolution may OOM, fall back to Colab
+- Monitor VRAM with `nvidia-smi` before training runs
+
+## Dataset Notes (Oxford Flowers 102)
+
+- TFDS `oxford_flowers102`: train (1,020), val (1,020), test (6,149)
+- Training set is tiny (10/class), must merge train+val for training
+- EfficientNet expects [0,255] input, use `preprocess_input` (NOT [0,1])
+- No vertical flips (flowers don't appear upside-down)
+- Label smoothing 0.1 for fine-grained classification
+
+## Portfolio Standards
+
+- Notebook must be Colab-compatible for reviewers (one-click run)
+- Single notebook tells the full story: EDA → baseline → transfer learning → evaluation
+- Clear markdown section headers separate phases
+- Business context and interpretation in every section

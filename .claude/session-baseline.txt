@@ -1,0 +1,16 @@
+# Session baseline - 2026-04-03T01:35:27+02:00
+# Session branch
+session-1/2026-04-03
+# HEAD commit
+6a26325e1a08f3e1e445f300ae640393260fd7ca
+# Working tree
+ M .claude/dsm-ecosystem.md
+?? .claude/session-baseline.txt
+?? .gitignore
+?? .venv/
+?? .vscode/
+?? dsm-docs/plans/done/
+?? dsm-docs/plans/sprint-1-plan.md
+?? dsm-docs/research/2026-04-03_rag-architectures_research.md
+?? requirements_base.txt
+?? requirements_project.txt

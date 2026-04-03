@@ -1,0 +1,28 @@
+# References (private)
+_references/
+
+# Virtual environment
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TensorFlow datasets cache
+tensorflow_datasets/
+
+# Model artifacts
+*.h5
+*.keras
+saved_models/
