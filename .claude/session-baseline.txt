@@ -14,3 +14,4 @@ session-1/2026-04-03
 ?? dsm-docs/research/2026-04-03_rag-architectures_research.md
 ?? requirements_base.txt
 ?? requirements_project.txt
+mode: light
