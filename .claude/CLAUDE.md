@@ -43,15 +43,84 @@ Use "," instead of "—" for connecting phrases in any language.
 - Build incrementally: imports → constants → one function → test → next function
 <!-- END DSM_0.2 ALIGNMENT -->
 
-# Project: Advanced DS and AI Portfolio Projects
+
+## Section 2: Participation Pattern (spoke)
+
+### Working Style
+- Confirm understanding before proceeding
+- Be concise in answers
+- Do not generate files before providing description and receiving approval
+
+### Command Execution
+- Execute read-only commands (git status, ls, cat, grep, find, python -c for reading) without asking
+- Show write commands (git commit, git push, rm, mv, pip install, file edits) for my approval first
+
+### Plan Mode Protocol
+Before implementing any significant feature or change:
+1. Thoroughly explore the codebase to understand existing patterns
+2. Identify similar features and architectural approaches
+3. Consider multiple approaches and their trade-offs
+4. Ask clarifying questions if approach is unclear
+5. Design a concrete implementation strategy
+6. Present plan for user approval before writing/editing any files
+
+This is a read-only exploration and planning phase - DO NOT write or edit files until plan is approved.
+
+
+## Section 3: Project Type (hybrid: notebook + app)
+
+### Code Output Standards
+- Print statements show actual values (shapes, metrics, counts)
+- Avoid generic confirmations: "Complete!", "Done!", "Success!"
+- Let results speak: Show df.shape, not "Data loaded successfully!"
+
+### Notebook Development Protocol
+When generating notebook cells:
+1. Generate ONE cell at a time; unless the first cell contains markdown only, then generate up to TWO cells
+2. Wait for user approval OR execution output before generating next cell
+3. Never generate multiple cells without explicit request
+4. Adapt each cell based on actual output from previous cells
+5. Number each cell with a comment (e.g., `# Cell 1`, `# Cell 2`) for easy reference in discussions
+
+Interaction pattern:
+- User describes goal -> Agent proposes cell -> User approves/runs -> Agent sees output -> Agent generates next cell
+- "Continue" or "yes" = generate next cell
+- "Generate all cells" = explicit batch override
+
+### App Development Protocol
+
+When building application code (packages, modules, scripts):
+1. Guide step by step through the development process
+2. Explain **why** before each action
+3. Provide code segments for user to copy/paste
+4. Wait for user confirmation before proceeding to next step
+5. Generate no files directly - user creates all artifacts
+6. Build modules incrementally: imports → constants → one function → test → next function
+7. Use Test-Driven Development (TDD): write tests in `tests/` alongside code
+
+**Interaction pattern:**
+- Claude explains purpose → provides code → user creates file → user confirms → next step
+- "Done" or "next" = proceed to next step
+- "Explain more" = deeper explanation before proceeding
+
+Why: This establishes a learning-focused protocol where you remain in control of file creation, ensuring you understand each piece as it's built. Different from the notebook protocol which is about incremental cell generation.
+
+
+## Section 4: Project Specific
+
+### Author
+**Alberto Diaz Durana**
+[GitHub](https://github.com/albertodiazdurana) | [LinkedIn](https://www.linkedin.com/in/albertodiazdurana/)
+
+### Project: Advanced DS and AI Portfolio Projects
 Domain: Data Science / AI / Deep Learning
 
-## Current Focus
+### Current Focus
 
-Flower Classification (Oxford Flowers 102) — deep learning image classification
+Flower Classification (Oxford Flowers 102), deep learning image classification
 for a startup use case. Sprint plan: `dsm-docs/plans/sprint-1-plan.md`.
 
-## Environment
+### Environment
 
 - **Local GPU:** Quadro T1000, 4GB VRAM (CUDA 12.8)
 - **Python:** 3.10.12, venv at `.venv/`
@@ -59,13 +128,13 @@ for a startup use case. Sprint plan: `dsm-docs/plans/sprint-1-plan.md`.
 - **Notebook:** `notebooks/flower-classification.ipynb`
 - **Kernel:** `flower_classification`
 
-## Hardware Constraints
+### Hardware Constraints
 
 - EfficientNetB0 at 224×224, batch 16 fits locally
 - EfficientNetB3+ or 300×300 resolution may OOM, fall back to Colab
 - Monitor VRAM with `nvidia-smi` before training runs
 
-## Dataset Notes (Oxford Flowers 102)
+### Dataset Notes (Oxford Flowers 102)
 
 - TFDS `oxford_flowers102`: train (1,020), val (1,020), test (6,149)
 - Training set is tiny (10/class), must merge train+val for training
@@ -73,7 +142,7 @@ for a startup use case. Sprint plan: `dsm-docs/plans/sprint-1-plan.md`.
 - No vertical flips (flowers don't appear upside-down)
 - Label smoothing 0.1 for fine-grained classification
 
-## Portfolio Standards
+### Portfolio Standards
 
 - Notebook must be Colab-compatible for reviewers (one-click run)
 - Single notebook tells the full story: EDA → baseline → transfer learning → evaluation
