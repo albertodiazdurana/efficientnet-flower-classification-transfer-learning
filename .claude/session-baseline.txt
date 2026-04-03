@@ -1,11 +1,9 @@
-# Session baseline - 2026-04-03T10:29:58+02:00
+# Session baseline - 2026-04-03T11:58:31+02:00
 # Session branch
 session-1/2026-04-03
 # HEAD commit
-d9502ca9a1863c96ff65334aa474235555a43482
+3ff08add3b805d8f9e5270d0cfd73095cddf73af
 # Working tree
  M .claude/session-baseline.txt
-RM dsm-docs/checkpoints/2026-04-03_s1_phase1-eda-complete.md -> dsm-docs/checkpoints/done/2026-04-03_s1_phase1-eda-complete.md
- M notebooks/flower-classification.ipynb
-?? dsm-docs/plans/done/
+?? dsm-docs/checkpoints/2026-04-03_s2_claude-md-restructure.md
 mode: light
