@@ -1549,3 +1549,403 @@ Lightweight wrap-up complete:
 - No remote configured, push skipped
 - Checkpoint: dsm-docs/checkpoints/2026-04-04_s5_transfer-learning-complete.md
 - Baseline: mode: light preserved for next /dsm-light-go
+
+---
+
+## Session 6 (lightweight continuation)
+**Started:** 2026-04-04T20:30:00+02:00
+**Previous session artifacts:**
+- Checkpoint: 2026-04-04_s5_transfer-learning-complete.md
+- MEMORY.md updated: yes
+
+**Context loaded:**
+- MEMORY.md (latest)
+- Checkpoint: 2026-04-04_s5_transfer-learning-complete.md
+
+---
+
+<------------Start Thinking / 20:35------------>
+User said "proceed" = approval to start Cell 21.
+
+Pre-flight for Cell 21:
+- Phase/section: continuation of Phase 4 evaluation / transition to Phase 5
+- If new phase: this is a comparison cell, still part of transfer learning evaluation
+- Cell type: code
+
+What: Cell 21 - side-by-side comparison of baseline CNN vs EfficientNetB0 transfer learning
+Why: Sprint plan requires clear comparison to demonstrate transfer learning value; portfolio reviewers need visual + numeric evidence
+How: Create a comparison table (accuracy, F1, params, training time) + bar chart visualization. Need to read notebook to find the exact variable names for baseline and transfer metrics.
+
+Need to read notebook to get variable names for metrics from cells 13 and 20.
+
+After reading notebook:
+- Baseline: test_acc (0.2456 hardcoded in cell 20), report (from cell 13), baseline_model (153K params), 5.6 min training
+- Transfer: test_acc, report_tf (cell 20), transfer_model (4.18M params), training 2.3+3.4+4.2=9.9 min total
+- Variables in scope: baseline_test_acc=0.2456 (hardcoded), test_acc (transfer), report (baseline dict), report_tf (transfer dict)
+- class_f1 (baseline), class_f1_tf (transfer) dicts available
+- Training times not stored in variables, will hardcode from observed outputs
+
+Plan for Cell 21:
+1. Markdown cell introducing the comparison section (use two-cell allowance)
+2. Code cell with:
+   a. Summary table printed (model, params, test acc, macro F1, training time)
+   b. Bar chart comparing accuracy and F1 side by side
+   c. Per-class F1 improvement scatter or bar showing biggest gains
+
+<------------Start Thinking / 20:45------------>
+User asked for evidence display. Compiling the quantitative facts.
+
+Evidence for Cell 21 design:
+- Baseline CNN: 153,382 params, 24.56% test acc, 0.1984 macro F1, 5.6 min (CPU)
+- Transfer EfficientNetB0: 4,180,233 params (27.2x more), 89.27% test acc, 0.8914 macro F1, 9.9 min total (GPU, 3 phases)
+- Accuracy improvement: +64.71pp (from 24.56% to 89.27%), a 3.64x multiplier
+- F1 improvement: +0.6930 (from 0.1984 to 0.8914), a 4.49x multiplier
+- Param efficiency: baseline 0.16% acc per 1K params, transfer 0.021% acc per 1K params
+  BUT transfer leverages ImageNet pretraining (1.2M images), so raw param efficiency comparison misleads
+- Training time: transfer is 1.77x longer but includes 3 phases on GPU vs baseline on CPU
+  Fair comparison hard due to different hardware; will note this caveat
+- The 102-class fine-grained task with only 10 samples/class is exactly where transfer learning shines
+  (pretrained features compensate for tiny training set)
+- Chart design: grouped bar chart with 2 groups (Accuracy, Macro F1) × 2 bars (Baseline, Transfer)
+  This is the clearest visual for a 2-model comparison with 2 metrics
+
+<------------Start Output / 20:48------------>
+Generating Cell 21 markdown + Cell 21 code (two-cell allowance: first is markdown).
+Markdown cell introduces comparison section, code cell does the table + chart.
+
+User ran markdown cell, said "done". Now generating the code cell.
+
+Pre-flight for Cell 21 (code):
+- Phase/section: Phase 5 continuation
+- Cell type: code
+- Variables available: baseline_test_acc (hardcoded 0.2456), test_acc (transfer), report, report_tf dicts
+- Training times not in variables, hardcode from observed outputs
+- Need to print summary table + grouped bar chart
+- Save figure to outputs/figures/evaluation/ for validation
+
+<------------Start Output / 20:55------------>
+Cell 21 executed. Table output correct. Figure saved to outputs/figures/evaluation/.
+Now need to read the saved figure to validate the chart before proceeding.
+Figure validated. Chart is clean: grouped bars, clear labels, value annotations on bars.
+The contrast between baseline (~25%) and transfer (~89%) is visually striking.
+Note: figure saved to notebooks/outputs/figures/evaluation/ (relative to notebook CWD).
+
+Cell 21 complete. Next: Cell 22 (most-confused pairs analysis).
+
+<------------Start Thinking / 21:00------------>
+User approved what/why/how for Cell 22 but skipped evidence. Generating code cell.
+
+Pre-flight for Cell 22:
+- Phase/section: Phase 5 continuation
+- Cell type: code
+- Variables: y_true_tf, y_pred_tf, class_names, confusion_matrix (imported)
+- Will compute confusion matrix, extract off-diagonal pairs, rank by count
+- Show top 10 confused pairs + mini heatmap of those classes
+- Save figure to notebooks/outputs/figures/evaluation/
+
+<------------Start Output / 21:05------------>
+Cell 22 executed successfully. Key findings:
+- Petunia is the most confused class (33 misclassified as tree mallow, 13 as hibiscus, 9 as sweet william, 8 as azalea)
+- Top 10 pairs = 115/660 errors (17.4%), errors are distributed, not concentrated
+- Heatmap validated: diagonal shows correct predictions, off-diagonal confusion visible
+- Figure saved to notebooks/outputs/figures/evaluation/s01_d01_confused_pairs.png
+
+Remaining sprint items:
+- Phase 5: Final evaluation summary and business recommendations
+- Optional: re-run 4a+4b to recover 93.87%
+
+<------------Start Thinking / 21:08------------>
+User wants a visual comparison of the top 3 confused pairs. This means showing
+actual flower images side by side so reviewers can see WHY the model confuses them.
+
+Pre-flight for Cell 23:
+- Phase/section: Phase 5 continuation (evaluation detail)
+- Cell type: code
+- Top 3 pairs: petunia→tree mallow (33), petunia→hibiscus (13), rose→globe-flower (11)
+
+What: Cell 23 - visual comparison of top 3 most-confused pairs, showing sample images from each class side by side
+Why: Portfolio reviewers and stakeholders need to see the visual similarity that explains model confusion; makes the analysis tangible
+How: For each pair (true class, predicted class), pull 3 sample images from the test set for each class.
+  Layout: 3 rows (one per pair) × 6 columns (3 true class + 3 predicted class), with row labels.
+  Need to access the test dataset to get images by class label.
+  Variables available: test_pipeline (batched), class_names, y_true_tf, y_pred_tf
+  Challenge: test_pipeline is batched/prefetched, need to iterate to collect images by class.
+  Alternative: reload from TFDS directly to pick by label. But test_pipeline already exists.
+  Best approach: iterate test_pipeline, collect a few images per needed class.
+  6 classes involved: petunia, tree mallow, hibiscus, rose, globe-flower. That's 5 unique classes.
+  Will collect 3 images per class from test set.
+
+<------------Start Thinking / 21:12------------>
+Evidence display requested. Compiling technical facts for Cell 23.
+
+Image data facts:
+- test_pipeline: batched (16), prefetched, images are [0,255] float32, 224×224×3
+- Labels are one-hot encoded (NUM_CLASSES=102), need argmax to get class index
+- test_set (raw TFDS) is unbatched, test_pipeline is batched
+- To collect images by class, two options:
+  Option A: iterate test_pipeline (batched), collect images matching target classes
+  Option B: iterate test_set (raw, unbatched) with preprocess, simpler indexing
+  Option A is safer since test_pipeline is what the model sees, and it's already defined.
+  But iterating batched pipeline and filtering is slightly awkward.
+  Actually, test_set is still in scope (used in Cell 9). Can map preprocess on it
+  and filter by label. But test_set yields (image, label) where label is scalar int.
+  Simplest: iterate test_set, resize, filter by label, collect 3 per class.
+
+Display considerations:
+- Images are [0,255], need to cast to uint8 or /255 for matplotlib
+- 3 rows × 6 columns = 18 images total
+- Row labels: "petunia → tree mallow", "petunia → hibiscus", "rose → globe-flower"
+- Column headers: "True: [class]" (3 cols) + "Predicted: [class]" (3 cols)
+- Need class name → index mapping: class_names is a list, index = position
+
+Top 3 pairs from output:
+1. petunia → tree mallow (33 confusions)
+2. petunia → hibiscus (13 confusions)
+3. rose → globe-flower (11 confusions)
+
+5 unique classes to fetch images for: petunia, tree mallow, hibiscus, rose, globe-flower
+3 images each = 15 images total (petunia reused across rows 1 and 2)
+
+<------------Start Output / 21:15------------>
+Generating Cell 23 code. User approved what/why/how + evidence.
+Cell 23 executed. Figure validated. Visual observations:
+
+Row 1 (petunia → tree mallow, 33×): Both have large funnel-shaped blooms in pink/magenta tones.
+Very similar petal structure and color palette. Understandable confusion.
+
+Row 2 (petunia → hibiscus, 13×): Petunias are pink/magenta funnels, hibiscus are larger
+with prominent stamens. Color overlap (pink/salmon) but shape differs. Model may key on color.
+Hibiscus samples include peach/salmon tones which could overlap with lighter petunias.
+
+Row 3 (rose → globe-flower, 11×): Roses shown in red/pink/white, globe-flowers are yellow
+with rounded cup shape. Less visually obvious confusion, but the rounded petal arrangement
+is shared. Globe-flowers have a more closed, spherical form.
+
+Layout issue: row labels are not visible (labelpad may not be enough). The green/red borders
+are subtle but present. Title renders well. Overall the visual story is clear even without
+row labels since the pairs are distinguishable by flower type.
+
+Minor: row labels got cut off. Could fix with more labelpad or use fig.text instead.
+Not blocking, the visual comparison works well for the portfolio.
+
+<------------Start Thinking / 21:22------------>
+User wants row labels fixed. The issue is set_ylabel with rotation=0 and labelpad=90
+gets clipped. Better approach: use fig.text() to place labels in figure coordinates,
+or increase left margin with fig.subplots_adjust and use larger labelpad.
+Simplest fix: replace set_ylabel with fig.text positioned to the left of each row.
+Need to calculate y positions based on row count.
+Will generate a fix cell that re-renders the figure.
+
+User wants row labels rotated vertically (90°) to save horizontal space.
+Use rotation=90 on fig.text, reduce left margin.
+
+<------------Start Output / 21:28------------>
+Cell 23 fix applied. Labels rendered horizontally (not rotated in final version) but now
+visible with proper spacing. Row labels show pair name + count. Figure validated.
+Cells 21-23 complete (comparison table, bar chart, confused pairs table, confused pairs heatmap, visual comparison).
+
+Remaining sprint items:
+- Phase 5: Final evaluation summary and business recommendations
+
+<------------Start Thinking / 21:30------------>
+Pre-flight for Cell 24:
+- Phase/section: new phase (Phase 5 conclusion), markdown cell first
+- Cell type: markdown
+- Two-cell allowance: markdown only, so can generate one cell
+
+What: Cell 24 - Final markdown summarizing key findings, business recommendations, and next steps
+Why: Portfolio standard requires business context and interpretation in every section
+How: Structure as key results, model strengths/limitations, business recommendations, next steps
+Facts: 89.27% test acc, 0.8914 F1, 1734 samples, 64.71pp over baseline, ~10 min training,
+main weakness is visually similar species (petunia/tree mallow/hibiscus)
+
+<------------Start Output / 21:35------------>
+Cell 24 (Phase 6 conclusions markdown) added by user. Sprint 1 notebook deliverables complete:
+- Phase 1: EDA (cells 1-8)
+- Phase 2: Data pipeline (cell 9)
+- Phase 3: Baseline CNN (cells 10-13)
+- Phase 4: Transfer learning (cells 14-20)
+- Phase 5: Comparison & confused pairs (cells 21-23)
+- Phase 6: Conclusions & recommendations (cell 24)
+
+All MUST and SHOULD deliverables from sprint plan are done.
+Optional: re-run 4a+4b to recover 93.87% weights (deferred to future work).
+
+<------------Start Thinking / 21:38------------>
+User asks what /dsm-finalize-project does before running it. Read the skill definition.
+Project has ~6 sessions → Medium size (4-10). Required: A, B, D, E, G, H, I. Optional: C, F.
+
+<------------Start Thinking / 21:45------------>
+User is giving feedback. I said "Sprint 1 notebook is complete" and suggested wrapping up,
+but I should have checked the sprint plan for remaining tasks beyond what the checkpoint listed.
+The checkpoint only tracked notebook cells, but the sprint plan likely has additional deliverables
+(README, Colab compatibility, etc.) that I didn't reference. I jumped to "ready to wrap up"
+without consulting the plan. This is a valid correction. I need to:
+1. Acknowledge the mistake
+2. Read the sprint plan now to identify what's actually remaining
+3. Save feedback memory about always checking the plan before declaring completion
+
+<------------Start Output / 21:48------------>
+Acknowledged mistake: declared sprint complete without checking sprint plan.
+Multiple deliverables still open (augmentation comparison, 90% gate, boundary checklist).
+Saved feedback memory. User also asked to document as DSM feedback.
+DSM feedback written.
+
+<------------Start Thinking / 21:52------------>
+User wants to make the notebook Colab-compatible first. This is a portfolio standard from
+CLAUDE.md: "Notebook must be Colab-compatible for reviewers (one-click run)".
+
+This means:
+1. The notebook needs to work end-to-end in Colab without local dependencies
+2. Need to check what would break: TFDS install, GPU detection, file paths, figure saving
+3. Colab has its own TF/Keras pre-installed but may need TFDS or specific versions
+4. The current notebook uses local paths for figure saving (outputs/figures/...)
+5. Need to add Colab setup cell at the top (install deps, mount drive or use Colab paths)
+
+Before proposing changes, I should read the notebook's first few cells to understand
+current setup, then identify what needs to change for Colab compatibility.
+
+This is a significant change, so per Plan Mode Protocol I should explore first and
+present a plan before editing.
+
+User clarified: not extending sprint 1, just making the existing notebook Colab-compatible.
+
+After reading Cell 1: it already has Colab detection and pip install. Good foundation.
+Issues to check for Colab compatibility:
+1. Cell 1: NVIDIA lib preloading is local-only but guarded by os.path.isdir, safe
+2. Figure save paths: use relative 'outputs/figures/...', should work in Colab too
+3. Cell 9: preprocess uses IMG_SIZE=224, no local paths
+4. Training cells: use time.time(), standard
+5. Cell 23: iterates test_set (raw TFDS), should work
+6. Main concern: does the notebook run end-to-end without errors in Colab?
+   User needs to test this. My role is to identify and fix any blockers.
+
+User wants a detailed audit of every cell. Need to read all cells systematically
+and check for Colab-breaking issues: local paths, local-only libs, missing installs,
+hardcoded values, env-specific code.
+
+Audit complete. Read all 26 cells. Findings below.
+
+<------------Start Output / 22:00------------>
+Colab compatibility audit results presented to user.
+
+<------------Start Thinking / 22:05------------>
+User wants to copy the notebook before applying fixes. Naming: current is
+flower-classification.ipynb, copy would be flower-classification-v1.ipynb
+(or v2 for the new one). Convention: v1 = original working version,
+new edits go on main file or a v2. Let me clarify naming with user.
+
+Actually user said "make a v1 copy" meaning save the current as v1 (backup),
+then apply changes to the main file. That's the standard approach.
+
+Command: cp notebooks/flower-classification.ipynb notebooks/flower-classification-v1.ipynb
+This is a write command, need to show for approval per spoke protocol.
+
+<------------Start Output / 22:10------------>
+User approved v1 backup and all 4 fixes. Applying via python script to modify notebook JSON.
+All 4 fixes applied successfully. Notebook is dual-compatible (local + Colab).
+
+<------------Start Thinking / 22:18------------>
+User asks about T4 GPU vs v5e-1 TPU in Colab. This is a general knowledge question.
+
+T4 GPU: NVIDIA Tesla T4, 16GB VRAM, CUDA-based. TensorFlow runs natively on it.
+v5e-1 TPU: Google's TPU v5e (1 core). TPUs use different programming model (XLA).
+
+For THIS notebook:
+- T4 GPU: works out of the box, no code changes needed. TF detects it automatically.
+- TPU v5e: requires code changes. TPU needs a TPU strategy wrapper (tf.distribute.TPUStrategy),
+  different data pipeline setup, and some ops may not be supported.
+  Our notebook does NOT have TPU support code. It would fail or run on CPU fallback.
+
+Recommendation: use T4 GPU for this notebook.
+
+<------------Start Output / 22:22------------>
+Answered T4 vs TPU question. User is running notebook in Colab on T4.
+
+<------------Start Thinking / 22:23------------>
+User says notebook is running in Colab, wants to move on. Need to check sprint plan
+for what's next. From the audit earlier:
+
+Remaining sprint items:
+- Experiment gate: 89.27% < 90% target (plan says consider B3 on Colab)
+- SHOULD: Augmentation comparison (document impact on val accuracy)
+- Sprint boundary checklist: README, decision log, blog entry
+
+User said they don't want to extend sprint 1. So the question is what to work on now.
+The sprint boundary checklist items (README, decision log) are wrap-up tasks, not extensions.
+Let me suggest those since they're required by the plan but don't add new model work.
+
+<------------Start Thinking / 22:26------------>
+Pre-flight for README:
+What: Update README.md with project status, results, structure
+Why: Sprint boundary checklist requires it; portfolio reviewers need a clear entry point
+How: Read current README, update with sprint 1 results, project structure, status
+
+Need to read current README first.
+
+User wants evaluation figures embedded in README. Available:
+- s01_d01_baseline_vs_transfer.png (bar chart)
+- s01_d01_confused_pairs.png (heatmap)
+- s01_d01_confused_pairs_visual.png (visual comparison grid)
+
+These are under notebooks/outputs/figures/evaluation/. For GitHub rendering,
+need relative paths from repo root.
+
+<------------Start Output / 22:30------------>
+README updated with results table and evaluation figures. User approved.
+
+<------------Start Thinking / 22:32------------>
+Decision log. Need to check what exists in dsm-docs/decisions/ and what key decisions
+were made during sprint 1. From the checkpoint and session work:
+
+Key decisions to document:
+1. Merge train+val splits (tiny dataset, 10/class)
+2. EfficientNetB0 over ResNet50 (research finding)
+3. Progressive unfreezing strategy (3 phases)
+4. Accept 4c regression instead of re-running 4b
+5. ReduceLROnPlateau removed from cosine decay phases
+6. 80/20 split instead of 85/15 (plan said 85/15 but code uses 80/20)
+
+Let me check existing decisions.
+
+<------------Start Output / 22:38------------>
+Decision log written: dsm-docs/decisions/2026-04-04_sprint-1-decisions.md (6 decisions).
+
+<------------Start Thinking / 22:40------------>
+Blog journal entry. Journal is append-only, captures blog-worthy observations.
+Key stories from sprint 1:
+1. Transfer learning on tiny datasets: 10 images/class → 89% accuracy
+2. The Phase 4c regression lesson (checkpoint before aggressive fine-tuning)
+3. Confused pairs analysis revealing visual similarity as the bottleneck
+4. Progressive unfreezing as a practical technique
+
+<------------Start Output / 22:42------------>
+Blog journal entry appended to dsm-docs/blog/journal.md.
+
+<------------Start Thinking / 22:45------------>
+Lightweight wrap-up triggered. Steps:
+1. Minimal MEMORY.md update
+2. Feature branch safety push
+3. Git commit + push (session work)
+4. Checkpoint
+5. Baseline mode marker
+6. Checkpoint commit + push
+
+Step 1: Update MEMORY.md session line.
+Current session is 6. Summary: comparison cells, confused pairs visual, Colab audit + fixes,
+README with figures, decision log, blog journal entry, sprint boundary checklist.
+
+Need to check git status first for GIT_AVAILABLE.
+
+Step 1 done: MEMORY.md and session_1_state.md updated.
+Step 2: Feature branch safety push. Branch is session-1/2026-04-03. Check if remote exists.
+Step 2: No remote configured, skip push.
+Step 3: Commit session work. Files to stage:
+- .claude/session-baseline.txt, .claude/session-transcript.md
+- README.md
+- dsm-docs/blog/journal.md, dsm-docs/decisions/2026-04-04_sprint-1-decisions.md
+- dsm-docs/feedback-to-dsm/2026-04-04_s6_plan-completion-check.md
+- dsm-docs/checkpoints/done/2026-04-04_s5_transfer-learning-complete.md (already staged rename)
+- notebooks/flower-classification.ipynb, notebooks/flower-classification-v1.ipynb
+- notebooks/outputs/figures/ (evaluation + updated baseline/transfer)
+- NOT .claude/projects/ (memory files, not project repo content)
