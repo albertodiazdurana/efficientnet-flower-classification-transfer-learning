@@ -106,9 +106,9 @@ When generating notebook cells:
 3. Never generate multiple cells without explicit request
 4. Adapt each cell based on actual output from previous cells
 5. Number each cell with a comment (e.g., `# Cell 1`, `# Cell 2`) for easy reference in discussions
-6. When a cell generates figures, save them to `outputs/figures/` and after
-   execution the agent reads the saved image to explore results and validate
-   the analysis before proceeding
+6. When a cell generates figures, after execution the agent reads the saved
+   image (using the path printed in cell output) to explore results and
+   validate the analysis before proceeding
 
 **Cell Generation Pre-Flight:** In addition to what/why/how, include these
 notebook-specific checks in the Session Transcript thinking block:

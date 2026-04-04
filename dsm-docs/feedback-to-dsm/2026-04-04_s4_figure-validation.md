@@ -32,9 +32,7 @@ not a technical limitation.
 
 Add to the Notebook Development Protocol:
 
-> When a cell generates figures, save them to `outputs/figures/` and after
-> execution the agent reads the saved image to explore results and validate
-> the analysis before proceeding.
+When a cell generates figures, after execution the agent reads the saved image (using the path printed in cell output) to explore results and validate the analysis before proceeding
 
 This closes the feedback loop: the agent generates the plot code, the user
 runs it, the agent reads the saved figure, validates the output, and then

@@ -1195,3 +1195,345 @@ Lightweight wrap-up steps:
 Session 4 summary: Evidence step added to what/why/how (CLAUDE.md + DSM feedback), figure validation rule (CLAUDE.md + DSM feedback), CUDA/GPU setup resolved (4 pitfalls: pip packages, nvJitLink symlink, VS Code kernel.json ignored, ctypes preload + lazy init), central GPU guide (~/gpu-setup.md), baseline CNN trained (22.8% val accuracy, 153K params, GPU confirmed working). Cell 1 updated with GPU preload fix.
 
 Let me check git state first.
+
+<------------Start Output / 14:38------------>
+Lightweight wrap-up complete:
+- MEMORY.md updated (session 4 line)
+- Committed: 1330936 (session work) + 96b068f (checkpoint)
+- No remote configured, push skipped
+- Checkpoint: dsm-docs/checkpoints/2026-04-04_s4_evidence-gpu-baseline.md
+- Baseline: mode: light preserved for next /dsm-light-go
+
+---
+
+## Session 5 (lightweight continuation)
+**Started:** 2026-04-04T16:50:00+02:00
+**Previous session artifacts:**
+- Checkpoint: 2026-04-04_s4_evidence-gpu-baseline.md
+- MEMORY.md updated: yes
+
+**Context loaded:**
+- MEMORY.md (latest)
+- Checkpoint: 2026-04-04_s4_evidence-gpu-baseline.md
+
+---
+
+<------------Start Thinking / 16:55------------>
+User ran Cell 12 (training curves). Output shows improved results vs checkpoint (29.17% vs 22.8%), likely from the full rerun with GPU fix. Key observations:
+- Best epoch 26/30: model still improving, could benefit from more epochs but that's fine for baseline
+- Train-val gap -0.0012: essentially zero, slight underfitting, no overfitting concern
+- 29.17% on 102 classes with 153K params and ~10 samples/class is reasonable for a from-scratch CNN
+- Figure saved to outputs/figures/baseline/s01_d01_baseline_training-curves.png
+
+Per figure validation rule (CLAUDE.md notebook protocol rule 6): must read the saved image to validate before proceeding.
+
+<------------Start Thinking / 17:00------------>
+User points out the figure validation rule is too rigid about paths. The saved image is at notebooks/outputs/figures/baseline/ (Jupyter cwd is notebooks/), but I searched only from repo root outputs/. The rule should say "read the saved image" without assuming a fixed path. Fix: update CLAUDE.md rule 6 to use the path printed in cell output rather than hardcoding outputs/figures/.
+
+Updated CLAUDE.md rule 6. Now reading figure from correct path.
+
+Figure validation (s01_d01_baseline_training-curves.png):
+- Two-panel layout (Loss / Accuracy), clear and readable
+- Loss panel: train loss decreases steadily, val loss noisy but trending down until ~epoch 26, then upticks slightly
+- Accuracy panel: both curves trend upward, val accuracy noisy (expected with small val set), best epoch 26 marked with dashed green line
+- Train and val curves track closely, confirming near-zero train-val gap (no overfitting)
+- The noise in val curves is expected given only 1,020 val samples (~10/class)
+- Figure is portfolio-ready: clear title, legend, axis labels
+
+Figure validated. Ready to proceed to Cell 13 (test set evaluation).
+
+<------------Start Thinking / 17:05------------>
+Pre-flight for Cell 13:
+- Phase/section: continuation of Phase 3 (Baseline CNN)
+- If new phase: no, same phase
+- Cell type: code
+
+What: Cell 13, test set evaluation for baseline CNN. Evaluate on the 6,149-sample test set with accuracy, classification report (top/bottom classes), and confusion matrix heatmap.
+Why: Complete the baseline evaluation before moving to transfer learning. Test accuracy gives the true generalization metric. Per-class metrics reveal which classes the small CNN struggles with.
+How:
+- Load best model from checkpoint (or use model in memory if still available)
+- model.evaluate() on test set for overall accuracy/loss
+- Generate predictions, compute classification_report (top 5 / bottom 5 by f1)
+- Confusion matrix heatmap saved to outputs/figures/baseline/
+- Print key metrics (accuracy, macro avg f1)
+- Keep it concise, one cell for metrics + figure
+
+<------------Start Thinking / 17:10------------>
+User wants evidence for Cell 13 approach. Key metrics to justify:
+- Why test set (not val): test has 6,149 vs val 1,020, more statistically reliable
+- Why top/bottom 5 by F1: 102 classes is too many to show all, F1 balances precision/recall
+- Why confusion matrix at 102x102: shows inter-class confusion patterns
+- Expected test accuracy: likely close to val 29.17%, possibly slightly different
+- Macro F1 vs accuracy: macro F1 treats all 102 classes equally regardless of support
+
+<------------Start Thinking / 17:18------------>
+Cell 13 output (partial, confusion matrix figure pending). Analysis:
+- Test accuracy 24.56% vs val 29.17%: ~4.7pp drop. Expected since test is a different distribution and larger. Still 25× better than random (0.98%).
+- Macro F1 0.1984: lower than accuracy because many classes have 0 F1 (model never predicts them)
+- Top classes: dahlias, geranium, californian poppy — visually distinctive flowers with strong color signals
+- Bottom classes: all 0.000 F1 — model never correctly predicts these. Likely confused with visually similar classes.
+- "pink-yellow dahlia?" has a question mark in the class name — that's from TFDS, not an error
+- The gap between top (0.72) and bottom (0.00) F1 shows massive class imbalance in model capability
+- This strongly motivates transfer learning: a from-scratch CNN with 153K params can't learn 102 fine-grained distinctions from 10 training samples each
+
+Waiting for confusion matrix figure output to validate.
+
+Figure validation (s01_d02_baseline_confusion-matrix.png):
+- 102×102 heatmap renders correctly, title shows "Test Accuracy: 24.6%"
+- Faint diagonal visible, model learned some class structure but predictions are widely dispersed
+- A few dark blue spots on diagonal (classes with strong F1: dahlias, geranium area)
+- Significant off-diagonal noise, model confuses many classes with each other
+- Some dark off-diagonal spots indicate systematic misclassifications (certain classes consistently predicted as another)
+- Tick labels every 10, readable. Color bar present.
+- Figure is portfolio-ready and tells the right story: baseline has weak diagonal, transfer learning should sharpen it.
+
+<------------Start Output / 17:20------------>
+Cell 13 complete. Test accuracy 24.56%, macro F1 0.1984. Confusion matrix validated. Baseline phase complete, ready for Phase 4 (transfer learning).
+
+<------------Start User / 17:22------------>
+How would an ideal confusion matrix look like?
+
+<------------Start Thinking / 17:22------------>
+User asking about ideal confusion matrix. Quick conceptual answer, no generation needed.
+
+<------------Start Thinking / 17:27------------>
+User wants to proceed to Phase 4: Transfer Learning. This is a new phase, so per notebook protocol:
+- New phase → markdown cell first (two-cell allowance: markdown + code)
+- But what/why/how first before generating
+
+Pre-flight for Cell 14:
+- Phase/section: NEW phase (Phase 4: Transfer Learning)
+- If new phase: markdown cell first (use two-cell allowance)
+- Cell type: markdown
+
+Pre-flight for Cell 15:
+- Phase/section: continuation of Phase 4
+- Cell type: code (EfficientNetB0 build + feature extraction training)
+
+Let me check the sprint plan for Phase 4 details and review CLAUDE.md constraints (EfficientNetB0 at 224x224, batch 16, progressive fine-tuning).
+
+Read sprint plan. Phase 4 has 3 sub-phases: 4a (head training, frozen backbone, lr=1e-3, 10 epochs), 4b (unfreeze top 30%, lr=1e-4, cosine decay, 15 epochs), 4c (full fine-tune if needed, lr=1e-5, 10 epochs).
+
+Sprint plan says sparse_categorical_crossentropy but our pipeline uses one-hot labels (CategoricalCrossentropy). Need to use CategoricalCrossentropy with label_smoothing=0.1, consistent with Cell 11.
+
+Also: sprint plan says preprocess_input, but per CLAUDE.md dataset notes, Keras 3 normalizes internally (preprocess_input is a no-op). Our pipeline already sends [0,255] range. EfficientNetB0 will handle normalization in its first layers.
+
+New phase = markdown cell first. Two-cell allowance: Cell 14 (markdown) + Cell 15 (code for 4a head training).
+
+What/why/how for Cell 14 (markdown):
+- What: Phase 4 intro markdown, explaining the transfer learning approach and 3-phase strategy
+- Why: Portfolio storytelling, connect baseline results to transfer learning motivation
+- How: Brief narrative: baseline limitation → ImageNet features → progressive unfreezing strategy
+
+What/why/how for Cell 15 (code, Phase 4a):
+- What: Load EfficientNetB0, freeze backbone, add classification head, train 10 epochs
+- Why: Feature extraction phase, leverages ImageNet features without disturbing them
+- How: tf.keras.applications.EfficientNetB0(include_top=False, weights='imagenet'), GAP → Dropout(0.4) → Dense(102, softmax), CategoricalCrossentropy(label_smoothing=0.1), Adam lr=1e-3, 10 epochs, same callbacks pattern
+
+Evidence presented and approved. Generating Cell 14 (markdown) + Cell 15 (code, Phase 4a).
+
+<------------Start User / 17:35------------>
+Why is progressive fine-tuning done in 3 phases? Are there different ways?
+
+<------------Start Thinking / 17:35------------>
+User asking a conceptual question about transfer learning strategies. This is a learning moment. Compare approaches: full fine-tune, feature extraction only, progressive unfreezing, and discriminative learning rates. Explain trade-offs with our specific constraints (10 samples/class, 102 classes).
+
+Explained 4 strategies, user understood. Cell 15 now running (Phase 4a head training).
+
+<------------Start Thinking / 17:40------------>
+Phase 4a results: val accuracy 88.97%, val loss 1.3806. 2.3 min training.
+- Jump from 29.17% (baseline) to 88.97% just from head training on frozen ImageNet features. This is the power of transfer learning.
+- Already close to the 90% sprint target, and we haven't even fine-tuned the backbone yet.
+- Val loss 1.38 is still relatively high (label smoothing contributes to this), room for improvement.
+- 2.3 min is fast as expected (only head gradients).
+- Phase 4b (partial unfreeze) should push past 90%.
+
+<------------Start Output / 17:40------------>
+Phase 4a complete. 88.97% val accuracy from head training alone. Ready for Phase 4b.
+
+<------------Start Thinking / 17:42------------>
+Pre-flight for Cell 16:
+- Phase/section: continuation of Phase 4 (Transfer Learning, sub-phase 4b)
+- If new phase: no, same phase
+- Cell type: code
+
+What: Cell 16, Phase 4b — partial unfreeze. Unfreeze top ~30% of backbone layers, train with lower LR.
+Why: Adapt high-level features (petal textures, color patterns) to flowers while protecting low-level features (edges, gradients).
+How:
+- Unfreeze top ~30% of backbone layers. EfficientNetB0 has 236 layers, top 30% ≈ last ~70 layers.
+- Recompile with Adam lr=1e-4 (10× lower than 4a to protect pretrained weights)
+- Cosine decay schedule per sprint plan
+- 15 epochs, EarlyStopping patience=7
+- VRAM: more gradients now (backbone top layers), but still within 4GB at batch 16
+
+Actually, let me check EfficientNetB0 layer count to be precise about the 30% cutoff.
+
+Cell 16 generated. User wants evidence for the hyperparameter choices. Evidence presented.
+
+<------------Start Thinking / 17:48------------>
+Phase 4b results:
+- Val accuracy: 93.87% (up from 88.97% in 4a). +4.9pp from partial unfreeze.
+- Val loss: 1.1700 (down from 1.3806)
+- Training time: 3.4 min (longer than 4a due to backbone gradients)
+- Best epoch: 14/15, ran full schedule, no early stopping triggered
+- Train accuracy: 99.2% at epoch 15, significant train-val gap now (99.2% vs 93.9% = 5.3pp)
+- Train-val gap suggests mild overfitting starting, which is expected with 1,734 samples and 3.2M trainable params
+- Already past the 90% sprint target!
+- Cosine decay worked well: smooth convergence, LR went from 1e-4 to ~1e-6
+- ReduceLROnPlateau never triggered (cosine decay handled it)
+
+Phase 4c (full fine-tune) is optional per sprint plan ("if needed"). We're at 93.87% val, above 90% target. Should we try 4c to squeeze more, or move to test evaluation?
+
+Given the train-val gap is growing, full fine-tune risks more overfitting. But with lr=1e-5 and few epochs it might help slightly. Let's present the choice to user.
+
+<------------Start Output / 17:48------------>
+Phase 4b complete. 93.87% val accuracy, above 90% sprint target.
+
+<------------Start User / 17:50------------>
+Why not option 2 (try Phase 4c)?
+
+<------------Start Thinking / 17:50------------>
+User wants to understand the reasoning. Fair question. Let me be balanced — 4c is a reasonable choice too, and I should present both sides honestly rather than being overly cautious.
+
+Presented balanced view. User wants to proceed with 4c. Generating Cell 17.
+
+Pre-flight for Cell 17:
+- Phase/section: continuation of Phase 4 (sub-phase 4c)
+- If new phase: no
+- Cell type: code
+
+What: Cell 17, Phase 4c — full fine-tune. Unfreeze all layers, lr=1e-5, cosine decay, 10 epochs.
+Why: Squeeze last 1-2pp by adapting low-level features. EarlyStopping safety net means no risk of degradation.
+How: backbone.trainable = True (all layers), recompile with lr=1e-5, cosine decay to 1e-7, 10 epochs, EarlyStopping patience=5.
+
+User wants what/why/how and evidence displayed for Cell 17 before running.
+
+<------------Start Thinking / 17:55------------>
+Cell 17 error: ReduceLROnPlateau tries to set the optimizer's learning_rate, but it was created with a CosineDecay schedule object, which makes the LR non-settable. ReduceLROnPlateau and LearningRateSchedule are incompatible — can't use both.
+
+Fix: remove ReduceLROnPlateau from callbacks_4c. Cosine decay handles LR reduction on its own. ReduceLROnPlateau was a safety net that's redundant with cosine decay and actually conflicts with it.
+
+Fixed and user re-ran. Results:
+
+<------------Start Thinking / 18:02------------>
+Phase 4c results: val accuracy 90.93%, DOWN from 93.87% (-2.94pp). Val loss 1.2147 UP from 1.1700.
+
+This is worse. EarlyStopping restored best epoch weights, but even the best epoch during 4c was worse than the end of 4b. What happened:
+
+1. When we recompiled the model, the optimizer state (Adam momentum/velocity) was reset. The model started 4c with fresh optimizer state, which caused instability in the first few epochs.
+2. Unfreezing all layers at once, even at 1e-5, allowed the early layers to shift. With only 1,734 samples providing gradients, this was enough to degrade features.
+3. The "restore_best_weights" restored to the best epoch WITHIN 4c, not the 4b weights. So we lost the 4b optimum.
+
+Important: the model in memory now holds the 4c weights (90.93%), not the 4b weights (93.87%). We need to address this.
+
+Options:
+a) Discard 4c, reload 4b weights — but we didn't save a checkpoint after 4b
+b) Re-run 4b to restore (wasteful)
+c) Accept 4c result and proceed — but 90.93% < 93.87%
+d) The model should still have the 4b history, but the weights are gone since we didn't save
+
+This is a learning moment: always save a checkpoint before attempting a risky phase. The "no risk" claim in evidence was wrong — restore_best_weights only restores within the current .fit() call, not to pre-fit state.
+
+Best path: acknowledge the mistake, note we should have saved the model after 4b, and re-run 4b to restore the 93.87% weights. Or proceed with 90.93% which still beats 90% target.
+
+Actually wait — we can just re-run Cell 16 (Phase 4b) to restore. The 4a weights are still intact since 4b and 4c built on top. No, that's wrong too — the backbone weights have been modified by both 4b and 4c.
+
+We need to re-run from Cell 15 (4a) and Cell 16 (4b), skipping 4c. That's ~5.5 min total.
+
+Or: accept 90.93% and move on. Still above 90% target.
+
+User wants to document the lesson and move on with 90.93%. Good learning moment for portfolio.
+
+<------------Start Thinking / 18:06------------>
+Pre-flight for Cell 18:
+- Phase/section: continuation of Phase 4, documenting 4c outcome
+- If new phase: no
+- Cell type: markdown
+
+What: Cell 18, markdown cell documenting the Phase 4c outcome and the checkpoint lesson.
+Why: Portfolio narrative — showing the failure and lesson learned is more valuable than hiding it.
+How: Brief markdown summarizing the 3-phase results, the 4c regression, and the takeaway.
+
+Then Cell 19 would be the transfer learning training curves (all 3 phases combined), followed by Cell 20 for test evaluation. Let me present what/why/how for Cell 18 first.
+
+Cell 18 (markdown) approved by user. Now generating Cell 19 (training curves).
+
+<------------Start Thinking / 18:10------------>
+Pre-flight for Cell 19:
+- Phase/section: continuation of Phase 4
+- If new phase: no
+- Cell type: code
+
+What: Cell 19, training curves for all 3 transfer learning phases (4a, 4b, 4c) concatenated in a single plot.
+Why: Visual comparison of how each phase improved (or degraded) performance. Shows the progression and the 4c regression visually.
+How:
+- Concatenate history_4a, history_4b, history_4c into continuous epoch axis
+- Two-panel plot (loss/accuracy) like baseline curves
+- Vertical dashed lines at phase boundaries
+- Phase labels (4a, 4b, 4c)
+- Save to outputs/figures/transfer/
+- Mark the overall best epoch (which should be in 4b territory)
+
+Figure validation (s01_d03_transfer_training-curves.png):
+- Two-panel layout, clear title, phase boundary lines visible
+- Loss panel: sharp drop in 4a, continued improvement in 4b, slight uptick in 4c (visible regression)
+- Accuracy panel: jump to ~89% in 4a, climb to ~94% in 4b, drop back in 4c
+- Best epoch 20 (in 4b) marked with green dashed line, correctly in the 4b region
+- Phase labels ("4b: Top 30%", "4c: Full") visible at boundaries
+- The 4c regression is clearly visible in both panels — great for the portfolio narrative
+- Train-val gap widens through 4b-4c, showing increasing overfitting
+
+<------------Start Output / 18:14------------>
+Cell 19 complete. Training curves validated. Best epoch 20 (in Phase 4b) at 94.12% val accuracy. 4c regression clearly visible. Ready for Cell 20 (test evaluation).
+
+<------------Start Thinking / 18:16------------>
+Pre-flight for Cell 20:
+- Phase/section: continuation of Phase 4
+- If new phase: no
+- Cell type: code
+
+What: Cell 20, test evaluation for transfer model. Same structure as Cell 13 for comparison.
+Why: Final model evaluation on held-out test set. Direct comparison with baseline.
+How: model.evaluate on test_pipeline, classification_report top/bottom 5, confusion matrix heatmap, save figure, print comparison with baseline (24.56%).
+
+<------------Start Thinking / 18:22------------>
+Cell 20 output (metrics, figure pending):
+- Test accuracy: 89.27% (vs 90.93% val). Small drop, consistent.
+- Below 90% sprint target on test set (89.27%). Val was 90.93% but test is the real metric.
+- Macro F1: 0.8914, very close to accuracy, meaning performance is balanced across classes
+- Improvement over baseline: +64.71pp (24.56% → 89.27%)
+- Top classes: bird of paradise, globe thistle, alpine sea holly at perfect 1.000 F1
+- Bottom classes: sweet pea 0.552 is the worst, but even that is far above baseline's 0.000s
+- No classes at 0.000 F1 anymore! Every class is being predicted correctly at least sometimes.
+- CUDA timer warnings are benign (Nsight profiling noise), don't affect results.
+
+The 4c regression cost us: if we had 4b weights, test accuracy would likely be ~92-93%.
+
+Waiting for confusion matrix figure.
+
+Figure validation (s01_d04_transfer_confusion-matrix.png):
+- Strong dark diagonal across all 102 classes — massive improvement over baseline's faint diagonal
+- Very little off-diagonal noise, background is almost white
+- A few faint off-diagonal spots (confused pairs), but nothing dominant
+- Color scale goes to ~200+ (vs ~70 in baseline), more samples correctly classified per class
+- This is much closer to the "ideal" confusion matrix the user asked about earlier
+- Portfolio-ready, the visual contrast with baseline is striking
+
+<------------Start Output / 18:24------------>
+Cell 20 complete. Test accuracy 89.27%, macro F1 0.8914. Confusion matrix shows strong diagonal. Transfer learning phase complete.
+
+<------------Start Thinking / 18:28------------>
+Lightweight wrap-up triggered. Steps:
+1. Update MEMORY.md (session line only)
+2. Feature branch safety push
+3. Git commit + push session changes
+4. Checkpoint
+5. Baseline mode marker
+6. Checkpoint commit + push
+
+Step 1: Update MEMORY.md session line. Current session is 5.
+Summary: Phase 3 complete (baseline test eval), Phase 4 complete (EfficientNetB0 3-phase fine-tuning, 89.27% test accuracy, 4c regression documented).
+
+Step 1: MEMORY.md updated (session 5 line).
+Step 2: No remote, push skipped.
+Step 3: Committing session changes.
