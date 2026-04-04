@@ -1949,3 +1949,8 @@ Step 3: Commit session work. Files to stage:
 - notebooks/flower-classification.ipynb, notebooks/flower-classification-v1.ipynb
 - notebooks/outputs/figures/ (evaluation + updated baseline/transfer)
 - NOT .claude/projects/ (memory files, not project repo content)
+
+Step 3 done: committed 7f42ab5.
+Step 4: Write checkpoint.
+Step 5: Write baseline mode marker.
+Step 6: Commit checkpoint + baseline.
