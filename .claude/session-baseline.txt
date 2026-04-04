@@ -1,9 +1,8 @@
-# Session baseline - 2026-04-03T11:58:31+02:00
+# Session baseline - 2026-04-04T10:00:00+02:00
 # Session branch
 session-1/2026-04-03
 # HEAD commit
-3ff08add3b805d8f9e5270d0cfd73095cddf73af
+a92d2fc
 # Working tree
- M .claude/session-baseline.txt
-?? dsm-docs/checkpoints/2026-04-03_s2_claude-md-restructure.md
+ M .claude/session-transcript.md
 mode: light

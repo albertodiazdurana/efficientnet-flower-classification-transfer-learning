@@ -66,6 +66,25 @@ Before implementing any significant feature or change:
 
 This is a read-only exploration and planning phase - DO NOT write or edit files until plan is approved.
 
+### What/Why/How (Critical Thinking before generation)
+
+Before generating any artifact (cell, code, file, text), apply Critical
+Thinking (DSM_6.0 §1.4.2):
+1. **What** — what is this generation? (type, structure, role in the plan)
+2. **Why** — why is it needed? (what requirement or goal it serves)
+3. **How** — how will it be done? (approach, constraints, applicable rules)
+
+Present what/why/how to the user. Wait for approval before generating.
+
+Universal interaction pattern:
+- Agent applies what/why/how → presents to user → user reviews and approves →
+  agent generates → user confirms or corrects → next step
+- "Continue" or "yes" = approval to generate
+- "Explain more" = deeper what/why/how before proceeding
+
+Project-type protocols (Notebook, App) add context-specific checks on top of
+this pattern.
+
 
 ## Section 3: Project Type (hybrid: notebook + app)
 
@@ -82,9 +101,16 @@ When generating notebook cells:
 4. Adapt each cell based on actual output from previous cells
 5. Number each cell with a comment (e.g., `# Cell 1`, `# Cell 2`) for easy reference in discussions
 
-Interaction pattern:
-- User describes goal -> Agent proposes cell -> User approves/runs -> Agent sees output -> Agent generates next cell
-- "Continue" or "yes" = generate next cell
+**Cell Generation Pre-Flight:** In addition to what/why/how, include these
+notebook-specific checks in the Session Transcript thinking block:
+```
+Pre-flight for Cell N:
+- Phase/section: [new or continuation?]
+- If new phase: markdown cell first (use two-cell allowance)
+- Cell type: [markdown / code]
+```
+
+Interaction pattern: Follows what/why/how (Section 2). Additionally:
 - "Generate all cells" = explicit batch override
 
 ### App Development Protocol
@@ -98,10 +124,8 @@ When building application code (packages, modules, scripts):
 6. Build modules incrementally: imports → constants → one function → test → next function
 7. Use Test-Driven Development (TDD): write tests in `tests/` alongside code
 
-**Interaction pattern:**
-- Claude explains purpose → provides code → user creates file → user confirms → next step
+**Interaction pattern:** Follows what/why/how (Section 2). Additionally:
 - "Done" or "next" = proceed to next step
-- "Explain more" = deeper explanation before proceeding
 
 Why: This establishes a learning-focused protocol where you remain in control of file creation, ensuring you understand each piece as it's built. Different from the notebook protocol which is about incremental cell generation.
 
@@ -138,7 +162,7 @@ for a startup use case. Sprint plan: `dsm-docs/plans/sprint-1-plan.md`.
 
 - TFDS `oxford_flowers102`: train (1,020), val (1,020), test (6,149)
 - Training set is tiny (10/class), must merge train+val for training
-- EfficientNet expects [0,255] input, use `preprocess_input` (NOT [0,1])
+- EfficientNet expects [0,255] input; Keras 3 normalizes internally (`preprocess_input` is a no-op)
 - No vertical flips (flowers don't appear upside-down)
 - Label smoothing 0.1 for fine-grained classification
 
