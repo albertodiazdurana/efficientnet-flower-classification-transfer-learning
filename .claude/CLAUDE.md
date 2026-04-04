@@ -73,12 +73,18 @@ Thinking (DSM_6.0 §1.4.2):
 1. **What** — what is this generation? (type, structure, role in the plan)
 2. **Why** — why is it needed? (what requirement or goal it serves)
 3. **How** — how will it be done? (approach, constraints, applicable rules)
+4. **Evidence** (on-demand) — quantitative justification for the chosen approach
+   (parameter counts, ratios, spatial math, complexity metrics, benchmarks).
+   After presenting what/why/how, ask: "Should I display the facts and metrics
+   to explain this approach?" Generate only if the user says yes.
 
 Present what/why/how to the user. Wait for approval before generating.
 
 Universal interaction pattern:
 - Agent applies what/why/how → presents to user → user reviews and approves →
   agent generates → user confirms or corrects → next step
+- After what/why/how approval, offer evidence: "Should I display the facts and
+  metrics to explain this approach?" → user accepts or skips
 - "Continue" or "yes" = approval to generate
 - "Explain more" = deeper what/why/how before proceeding
 
@@ -100,6 +106,9 @@ When generating notebook cells:
 3. Never generate multiple cells without explicit request
 4. Adapt each cell based on actual output from previous cells
 5. Number each cell with a comment (e.g., `# Cell 1`, `# Cell 2`) for easy reference in discussions
+6. When a cell generates figures, save them to `outputs/figures/` and after
+   execution the agent reads the saved image to explore results and validate
+   the analysis before proceeding
 
 **Cell Generation Pre-Flight:** In addition to what/why/how, include these
 notebook-specific checks in the Session Transcript thinking block:

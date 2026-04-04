@@ -639,3 +639,559 @@ Lightweight wrap-up. Steps:
 6. Checkpoint commit + push
 
 Session 3 summary: What/why/how universal rule (from Cell 8 markdown omission root cause → feedback → universal pattern), applied to CLAUDE.md. Cell 8 markdown generated, Cell 9 data pipeline fixed (removed no-op preprocess_input, Keras 3 diagnostic), CLAUDE.md Dataset Notes updated. Phase 2 complete, Phase 3 baseline CNN next.
+
+<------------Start Output / 11:22------------>
+Lightweight wrap-up complete:
+- MEMORY.md updated (session 3 line)
+- Committed: f23b7f6 (session work) + d9fb2bd (checkpoint)
+- No remote configured, push skipped
+- Checkpoint: dsm-docs/checkpoints/2026-04-04_s3_what-why-how-phase2.md
+- Baseline: mode: light preserved for next /dsm-light-go
+
+---
+
+## Session 4 (lightweight continuation)
+**Started:** 2026-04-04T12:00:00+02:00
+**Previous session artifacts:**
+- Checkpoint: 2026-04-04_s3_what-why-how-phase2.md
+- MEMORY.md updated: yes
+
+**Context loaded:**
+- MEMORY.md (latest)
+- Checkpoint: 2026-04-04_s3_what-why-how-phase2.md
+
+---
+
+<------------Start Thinking / 12:05------------>
+User approved proceeding with Cell 10: Phase 3 markdown introduction.
+
+Pre-flight for Cell 10:
+- Phase/section: New phase (Phase 3: Baseline CNN). Requires markdown intro first.
+- If new phase: Yes, markdown cell first (two-cell allowance applies, but I'll present markdown alone first per what/why/how)
+- Cell type: markdown
+
+What: Markdown cell introducing Phase 3 (Baseline CNN). Sets context for why we train a simple CNN before transfer learning.
+Why: Portfolio standard requires clear section headers with business context. A baseline establishes a performance floor to measure transfer learning improvement against.
+How: Brief markdown with:
+- Section header (## Phase 3: Baseline CNN)
+- 2-3 sentences: why a baseline matters (reference point), what we'll build (simple CNN), what we expect (modest accuracy given 102 classes with ~10 images/class)
+- No code in this cell
+
+This is straightforward, no judgment calls needed. Present what/why/how to user.
+
+<------------Start Output / 12:07------------>
+Cell 10 what/why/how presented. User approved. Generating markdown cell.
+Cell 10 generated and confirmed by user ("done"). Moving to Cell 11.
+
+<------------Start Thinking / 12:10------------>
+User confirmed Cell 10 (Phase 3 markdown). Now Cell 11: Baseline CNN code.
+
+Pre-flight for Cell 11:
+- Phase/section: Continuation of Phase 3
+- If new phase: No, markdown already placed
+- Cell type: code
+
+What: Code cell that defines, compiles, and trains a baseline CNN from scratch on the flower dataset.
+Why: Establishes performance floor before transfer learning. Shows the user can build a CNN and understand its limitations on small data.
+How:
+- Architecture: 3-4 conv blocks (Conv2D + BatchNorm + MaxPool), increasing filters (32→64→128→256)
+- Global average pooling → Dense(256) → Dropout(0.5) → Dense(102, softmax)
+- Optimizer: Adam lr=1e-3
+- Loss: categorical crossentropy with label smoothing 0.1 (per CLAUDE.md)
+- Callbacks: EarlyStopping (patience=5, restore_best_weights), ReduceLROnPlateau
+- Epochs: 30, batch size 16
+- Need to check what variables are available from previous cells (train_ds, val_ds, test_ds? or the merged dataset?)
+
+Let me check the notebook to see what's available from Cell 9.
+
+Read full notebook. Available from Cell 9:
+- IMG_SIZE=224, BATCH_SIZE=16, NUM_CLASSES=102, AUTOTUNE
+- train_pipeline, val_pipeline, test_pipeline (tf.data, batched, [0,255] range, one-hot labels)
+- augmentation (Sequential layer, used only in train)
+- train_size=1632, val_size=408
+
+Cell 11 plan:
+- Build baseline CNN from scratch
+- Architecture: 3 conv blocks (Conv2D→BatchNorm→ReLU→MaxPool), filters 32→64→128
+  Then GlobalAveragePooling2D → Dense(256, relu) → Dropout(0.5) → Dense(102, softmax)
+- 4 blocks might be overkill for 224×224 with such tiny data, 3 should be enough
+- Compile: Adam(lr=1e-3), CategoricalCrossentropy(label_smoothing=0.1)
+- Callbacks: EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True),
+  ReduceLROnPlateau(patience=3, factor=0.5)
+- history = model.fit(train_pipeline, validation_data=val_pipeline, epochs=30, callbacks)
+- Print model.summary() and final val metrics
+- Note: no GPU currently detected (Cell 1 output), training will be CPU-only, slow but workable for a small baseline
+
+Present what/why/how to user.
+
+<------------Start User / 12:15------------>
+User asks: we haven't installed CUDA, that's why we don't have GPU. Should we install it?
+
+<------------Start Thinking / 12:15------------>
+Trade-off analysis:
+- Baseline CNN is tiny (~100K params), 1,632 images, 30 epochs. CPU: ~5-10 min. Manageable.
+- Phase 4 (EfficientNetB0) will definitely need GPU.
+- CUDA install is a separate task that interrupts notebook flow.
+- Recommendation: run baseline on CPU, install CUDA before Phase 4.
+
+<------------Start Output / 12:18------------>
+User chose option 2: baseline on CPU, CUDA before Phase 4. Generating Cell 11.
+
+<------------Start User / 12:22------------>
+User asks: Why do we choose this architecture?
+
+<------------Start Thinking / 12:22------------>
+User wants to understand the reasoning behind the baseline CNN design choices. Let me explain each decision.
+
+<------------Start User / 12:25------------>
+User asks: Would there be a way to explain the selected architecture based on hard facts and metrics?
+
+<------------Start Thinking / 12:25------------>
+User wants data-driven justification, not just intuition. Good question.
+
+Ways to ground architecture choices in numbers:
+
+1. **Receptive field math:** 3 conv blocks with 3×3 kernels + MaxPool gives a specific receptive field. Can calculate whether it covers enough of the 224×224 input to capture flower-level features.
+
+2. **Parameter count vs training samples:** There's a rough heuristic that you want at least 5-10x more training samples than parameters to avoid overfitting. We can compute param count and compare to 1,632 samples.
+
+3. **Feature map dimensions:** After each block, show how spatial dimensions shrink and what that means for what the network "sees."
+
+4. **Capacity ratio:** Parameters-to-samples ratio is a concrete overfitting risk metric.
+
+This is actually a great teaching moment. We could add a brief analytical comment block in the cell or present it here. Let me calculate:
+
+3 blocks:
+- Conv2D(32, 3, 3, 3): 32*3*3*3 + 32 = 896
+- BN(32): 128 (64 trainable)
+- Conv2D(64, 3, 3, 32): 64*3*3*32 + 64 = 18,496
+- BN(64): 256 (128 trainable)
+- Conv2D(128, 3, 3, 64): 128*3*3*64 + 128 = 73,856
+- BN(128): 512 (256 trainable)
+- GAP: 0
+- Dense(256, 128 input): 128*256 + 256 = 33,024
+- Dense(102, 256 input): 256*102 + 102 = 26,214
+
+Total trainable ~ 896 + 64 + 18,496 + 128 + 73,856 + 256 + 33,024 + 26,214 = ~152,934
+
+Samples: 1,632
+Ratio: 152,934 / 1,632 ≈ 94 params per sample
+
+That's very high. Rule of thumb says <10 is comfortable, >50 is risky. This confirms we expect overfitting, which is the point of a baseline.
+
+Receptive field:
+- After block 1 (conv 3×3 + pool 2×2): receptive field = 4×4, spatial = 112×112
+- After block 2: RF grows, spatial = 56×56
+- After block 3: spatial = 28×28
+
+Feature map spatial dimensions track how much context each "pixel" sees.
+
+This is a clean way to present it. Hard numbers that justify the choices and predict behavior.
+
+<------------Start Output / 12:28------------>
+Presented parameter-to-sample ratio, spatial progression, and capacity analysis.
+
+<------------Start User / 12:32------------>
+User proposes extending what/why/how to what/why/how/why, where the final "why" explains the "how" with hard facts and metrics, generated on demand via "Should I display the facts and metrics to explain this approach?" Asks Q or S?
+
+<------------Start Thinking / 12:32------------>
+User is proposing a protocol extension. Let me evaluate.
+
+The idea: after presenting how (approach), offer a second "why" that grounds the how in quantitative evidence (param counts, ratios, spatial math, etc.). This is on-demand, not always shown.
+
+Strengths:
+- Separates the "intuitive why" (why we need this) from the "evidence-based why" (why this specific approach works)
+- On-demand keeps the flow lean, only expands when user wants depth
+- Matches what just happened naturally in this conversation: user asked "why this architecture?" → I gave intuitive reasoning → user pushed for hard facts → I gave metrics
+- Good for learning: user controls when to go deeper
+
+Concerns:
+- "why/how/why" naming is confusing: two "why"s with different meanings
+- Could be clearer with a different label: "evidence", "proof", "metrics", "justify"
+- But the user specifically asked about what/why/how/why structure
+
+Actually, the naming issue is real. The first "why" = purpose/goal. The second "why" = justification of approach. They're semantically different. Maybe suggest a distinct label?
+
+Options:
+- what/why/how/evidence
+- what/why/how + "justify?" prompt
+- Keep what/why/how/why but make the distinction clear in the rule
+
+I think I should share this concern (Q) rather than just stating it (S), because the user is asking for my opinion ("What do you think?") and naming matters for a protocol rule. Let me suggest an alternative label while supporting the core idea.
+
+<------------Start Output / 12:35------------>
+Suggested "evidence" as label instead of second "why" to avoid ambiguity. User approved what/why/how/evidence.
+
+<------------Start User / 12:37------------>
+User confirms: what/why/how/evidence is good.
+
+<------------Start Thinking / 12:37------------>
+Need to:
+1. Update CLAUDE.md Section 2 (what/why/how rule) to add the evidence step
+2. This is a CLAUDE.md change, so I need to present what/why/how first, then get approval
+
+What: Edit to CLAUDE.md Section 2, adding "evidence" as an optional 4th step to the what/why/how pattern.
+Why: Grounds approach decisions in quantitative facts (param counts, ratios, spatial math) rather than intuition alone. On-demand to keep flow lean.
+How: Add a 4th point under the what/why/how list, define it, add the on-demand trigger question. Update the interaction pattern to include the optional evidence step.
+
+Present to user for approval.
+
+<------------Start Output / 12:39------------>
+User approved. Updated CLAUDE.md Section 2: added "Evidence" as optional 4th step to what/why/how rule, with on-demand trigger question.
+
+<------------Start Thinking / 12:42------------>
+User wants feedback to DSM central about the evidence step. This is a feedback-to-dsm document.
+
+What: Feedback file for DSM central proposing the evidence extension to what/why/how.
+Why: DSM_6.0 §1.4.2 Critical Thinking defines what/why/how but lacks a quantitative justification step. This was discovered in practice when intuitive reasoning wasn't enough.
+How: Write to dsm-docs/feedback-to-dsm/, reference the CLAUDE.md implementation as a working example.
+
+<------------Start Output / 12:44------------>
+Feedback written: dsm-docs/feedback-to-dsm/2026-04-04_s4_evidence-step.md. References Session 3 what/why/how feedback, describes the gap, includes the baseline CNN as a concrete example, points to CLAUDE.md as working implementation.
+
+<------------Start User / 12:46------------>
+User confirms ready to run Cell 11 (baseline CNN).
+
+<------------Start Thinking / 12:46------------>
+Cell 11 was already generated and approved. User needs to copy-paste it into the notebook and run it. Per notebook collaboration protocol, I wait for the user to run and share output. The cell will train on CPU, should take ~5-10 min. Nothing for me to do until the user shares results.
+
+<------------Start User / 12:50------------>
+User says Cell 11 is already running for a while.
+
+<------------Start Thinking / 12:50------------>
+Good, training is in progress on CPU. Nothing to do but wait. I can let the user know what to expect and suggest we can work on something else while waiting, or just wait for results.
+
+<------------Start User / 12:52------------>
+User wants to plan Cell 12 while Cell 11 trains.
+
+<------------Start Thinking / 12:52------------>
+Pre-flight for Cell 12:
+- Phase/section: Continuation of Phase 3 (Baseline CNN)
+- If new phase: No, still Phase 3
+- Cell type: code (plotting training curves)
+
+What: Code cell that plots training/validation loss and accuracy curves from baseline_history.
+Why: Visual inspection of learning dynamics: did the model converge? overfit? plateau? This is standard ML practice and portfolio-expected. Also needed to interpret the baseline performance before moving to transfer learning.
+How:
+- Two subplots: loss (left) and accuracy (right)
+- Train and val lines on each
+- Mark best epoch (from EarlyStopping restore_best_weights)
+- Save figure to outputs/figures/
+- Use baseline_history.history dict
+
+Should I also consider a test set evaluation cell? That could be Cell 13. For now, Cell 12 = training curves.
+
+Present what/why/how to user. Then offer evidence question.
+
+<------------Start Output / 12:55------------>
+Cell 12 what/why/how presented. User skipped evidence, approved generation. Cell 12 generated.
+
+<------------Start User / 12:58------------>
+User proposes new notebook rule: whenever images are generated, save to outputs/figures/ and read them to explore results and validate analysis.
+
+<------------Start Thinking / 12:58------------>
+This is a CLAUDE.md change to the Notebook Development Protocol (Section 3).
+
+What: Add a rule to Section 3 notebook protocol about reading generated figures.
+Why: The agent generates plot code but never sees the actual output. Reading the saved image lets the agent validate the analysis visually (check for anomalies, confirm expectations, spot issues).
+How: Add to Notebook Development Protocol in Section 3. Short rule: figures saved to outputs/figures/ must be read by the agent after generation to validate results.
+
+We already save figures in the notebook (EDA cells do this). The new part is the agent reading them back. The Read tool can read images. This is a good practice.
+
+Present what/why/how for the CLAUDE.md edit.
+
+<------------Start Output / 13:00------------>
+User approved. Added rule 6 to Notebook Development Protocol in CLAUDE.md Section 3: figure validation via Read after execution.
+
+<------------Start User / 13:02------------>
+User asks to document rule 6 as feedback to DSM.
+
+<------------Start Thinking / 13:02------------>
+What: DSM feedback file for the figure validation rule.
+Why: Agents generate plot code in notebooks but never see the output. This is a gap in the notebook collaboration protocol, the agent can't validate its own visual output.
+How: Write to dsm-docs/feedback-to-dsm/, describe the gap and the rule, reference CLAUDE.md as implementation.
+
+<------------Start Output / 13:04------------>
+Feedback written: dsm-docs/feedback-to-dsm/2026-04-04_s4_figure-validation.md. Describes the visual output gap in notebook collaboration, proposes figure validation rule, references CLAUDE.md implementation.
+
+<------------Start User / 13:06------------>
+Cell 11 still running on CPU.
+
+<------------Start Thinking / 13:06------------>
+Training is taking longer than expected on CPU. We can continue planning ahead. Next items after Cell 12 (training curves, already planned) would be Cell 13: test set evaluation. Or we could plan the CUDA installation for Phase 4. Let me offer options.
+
+<------------Start User / 13:08------------>
+User wants to work on CUDA setup. Instructs: use other projects to understand how CUDA was installed previously.
+
+<------------Start Thinking / 13:08------------>
+Need to explore user's other projects to find CUDA installation patterns. Let me check sibling directories for any setup scripts, READMEs, or configuration files that document CUDA installation.
+
+Explored other projects. Key finding: CUDA is NOT installed manually. It comes automatically via pip when installing TensorFlow. The nvidia-cuda-* packages are bundled as pip dependencies. Other projects (computer_vision, Demand-forecasting-in-retail) use TF 2.20 with CUDA 12.9 / cuDNN 9.17, all installed via pip. No .bashrc modifications, no manual environment variables, no system-level CUDA toolkit needed on WSL2.
+
+This means our current project may already have GPU support if the right TF version pulled in the nvidia packages. Need to check.
+
+Checked: TF 2.21 is installed but no nvidia pip packages in the venv. TF reports "Could not find cuda drivers" and "Error loading CUDA libraries". The other projects have nvidia-cuda-* packages explicitly in their requirements. We just need to install them.
+
+Let me check what the computer_vision project has vs what we have.
+
+nvidia-smi works: Driver 573.57, CUDA 12.8. The WSL2 driver is fine.
+Computer_vision project has 12 nvidia pip packages (CUDA 12.9, cuDNN 9.17).
+Our venv has none of these. Just need to pip install them.
+
+But version compatibility: our TF is 2.21, computer_vision uses TF 2.20 with CUDA 12.9. Need to check if TF 2.21 supports those same versions.
+
+Actually, the simplest approach: just pip install the nvidia packages. TF 2.21 should pull compatible versions. Or we can install the exact versions from the working computer_vision project.
+
+<------------Start Output / 13:14------------>
+Driver is present. Just need nvidia pip packages. Present options to user.
+
+<------------Start User / 13:16------------>
+User will install nvidia packages, but notes restarting kernel will lose Cell 11 (still training).
+
+<------------Start Thinking / 13:16------------>
+Good catch. Options:
+1. Wait for Cell 11 to finish, note the results, then install + restart kernel + rerun everything
+2. Kill Cell 11 now, install CUDA, restart kernel, rerun Cell 11 on GPU (much faster)
+
+Option 2 is better: Cell 11 on CPU is slow. On GPU it would finish in seconds/minutes. The baseline CNN results aren't lost, just the training run. The code is saved. After kernel restart, user reruns all cells (1-11) which is fast for cells 1-9, and Cell 11 will train on GPU.
+
+Actually, cells 1-9 build the dataset pipeline. Those need to rerun too. But they're fast (seconds each). The only slow cell is 11, which will be fast on GPU.
+
+Recommend: stop Cell 11, install packages, restart kernel, rerun all cells. Cell 11 will train on GPU and be much faster.
+
+<------------Start User / 13:20------------>
+User ran pip install but it's stuck at "Preparing metadata (pyproject.toml) ... -" for nvidia-cublas-cu12. Asks if internet is too slow.
+
+<------------Start Thinking / 13:20------------>
+The nvidia packages are large (cublas alone is ~500MB+). The .tar.gz being downloaded is only 15kB which is the source distribution metadata, but the actual wheel download will be huge. The "Preparing metadata" step is building the wheel from source, which is unusual - normally pip downloads prebuilt wheels.
+
+The issue might be that pip is downloading source distributions instead of prebuilt wheels. This can happen if:
+1. No compatible wheel exists for the platform/python version
+2. pip is resolving to a newer version that only has source dists
+
+The computer_vision project used pinned versions. We should pin to known-working versions to get prebuilt wheels. Let me check if using --only-binary :all: or pinning versions would help.
+
+<------------Start Output / 13:22------------>
+Suggested pinned versions with --only-binary :all:. User installed successfully.
+
+<------------Start User / 13:25------------>
+User wants to document CUDA setup somewhere central to all projects, suggests somewhere in /home/berto.
+
+<------------Start Thinking / 13:25------------>
+User wants a central reference for CUDA/GPU setup that any project can find. Good idea.
+
+Options for location:
+- /home/berto/.claude/CLAUDE.md (global Claude instructions, loaded in every session)
+- /home/berto/_projects/README.md (exists, but not loaded automatically)
+- /home/berto/gpu-setup.md or similar standalone file
+- /home/berto/.claude/guides/ or similar
+
+The global CLAUDE.md is loaded automatically in every Claude session, but it's for agent instructions, not documentation. A standalone guide file would be better, and we can reference it from the global CLAUDE.md or from memory.
+
+Actually, the user said "somewhere in /home/berto" that's central. A simple guide file at /home/berto/gpu-setup.md or /home/berto/_projects/gpu-setup.md would work. The user can find it, and I can save a memory/reference pointing to it.
+
+Let me propose what/why/how for this.
+
+<------------Start User / 13:28------------>
+User ran Cell 1 after CUDA install + kernel restart. Still no GPU detected: "Cannot dlopen some GPU libraries. Skipping registering GPU devices..."
+
+<------------Start Thinking / 13:28------------>
+Packages installed but TF still can't find them. Possible causes:
+1. The notebook kernel might not be using the updated venv (kernel not restarted properly, or kernel points to different python)
+2. LD_LIBRARY_PATH not set to where pip installed the nvidia libs
+3. Version mismatch between TF 2.21 and the nvidia packages (from TF 2.20 / computer_vision)
+
+Let me check from the terminal: which python the venv uses, whether the nvidia libs are findable, and what TF reports about missing libs. Need more diagnostic info.
+
+Diagnosed: nvidia packages installed, .so files present, but LD_LIBRARY_PATH not set. TF can't dlopen the libraries. Setting LD_LIBRARY_PATH to the nvidia lib dirs fixes it: GPU detected successfully.
+
+Need a permanent fix: either set LD_LIBRARY_PATH in the venv activate script, or set it at the top of Cell 1. The venv activate approach is cleaner (works for terminal and notebook).
+
+<------------Start Output / 13:32------------>
+Presented two options. User chose option 1 (Cell 1). User already updated Cell 1 with the LD_LIBRARY_PATH fix. Looks correct, the nvidia lib path setup is before the TF import.
+
+<------------Start User / 13:35------------>
+Still no GPU detected after Cell 1 update. Same error: "Cannot dlopen some GPU libraries."
+
+<------------Start Thinking / 13:35------------>
+The LD_LIBRARY_PATH approach worked in the terminal but not in the notebook. The issue might be that:
+1. site.getsitepackages() returns different paths in the notebook kernel vs terminal
+2. The kernel might not be using the same venv
+3. LD_LIBRARY_PATH might need to be set BEFORE Python starts (some libs are loaded at process init)
+
+Actually, issue 3 is likely the key: TF loads CUDA libs at import time via dlopen, but the dynamic linker might cache the search paths at process start. Setting LD_LIBRARY_PATH after Python is already running might not work for all libraries.
+
+Let me check if the notebook kernel is actually using the right venv, and try an alternative approach: use os.environ before any import, or use ctypes to preload the libs.
+
+Diagnostic output: correct venv, nvidia dir exists with 11 lib dirs and .so files. But LD_LIBRARY_PATH is NOT SET after the diagnostic cell runs. This means the Cell 1 code that sets LD_LIBRARY_PATH either: (a) didn't run because user ran the diagnostic cell first, or (b) site.getsitepackages()[0] path check failed.
+
+Wait, user ran diagnostic cell separately (I asked them to run it "before any other imports"). So the diagnostic ran alone, showing LD_LIBRARY_PATH is not set (expected, since the fix code wasn't in the diagnostic cell).
+
+The real question is why Cell 1 with the fix didn't work. Looking at the Cell 1 code the user showed: the nvidia_lib path construction uses site.getsitepackages()[0] which is the correct path. The lib_dirs should be found. So the env var should be set before TF import.
+
+Unless... TF 2.21 doesn't use LD_LIBRARY_PATH at runtime and uses a different mechanism. Or the issue is that the nvidia packages from CUDA 12.9 are incompatible with the driver's CUDA 12.8.
+
+Let me check: nvidia-smi showed CUDA 12.8. The packages are CUDA 12.9. Could be a version mismatch where the runtime requires a newer driver than what's available.
+
+Actually, CUDA has forward compatibility: driver 12.8 should support runtime 12.8 and below but not 12.9. The packages are cu12 (CUDA 12.x) but specific version 12.9 - the driver might not support them.
+
+Let me test: try setting LD_LIBRARY_PATH and loading a specific lib to see the actual error.
+
+Diagnostic 2: cudart.so.12 loads fine via ctypes. So the library itself works. The issue is TF not finding it. Maybe LD_LIBRARY_PATH set via os.environ after process start doesn't affect TF's dlopen. Need to try: set LD_LIBRARY_PATH then import TF in the same cell, or check if TF uses a different lib discovery mechanism.
+
+Let me have the user test: set env var, then import tf, in same cell after kernel restart.
+
+Still fails in notebook even with LD_LIBRARY_PATH set before TF import. But it worked from terminal with the same LD_LIBRARY_PATH. The difference: in the terminal test I set LD_LIBRARY_PATH as a shell env var BEFORE starting python. In the notebook, it's set inside python via os.environ. 
+
+TF 2.21 might load CUDA via a mechanism that doesn't respect os.environ changes (e.g., the dynamic linker caches LD_LIBRARY_PATH at process start). The jupyter kernel process started without LD_LIBRARY_PATH, so even setting it later in Python doesn't help for dlopen.
+
+Solutions:
+1. Set LD_LIBRARY_PATH in the kernel spec's env (permanent fix for this kernel)
+2. Use nvidia-pyindex or tensorflow's built-in CUDA path resolution
+3. Symlink the nvidia libs to a standard path
+4. Check if TF 2.21 has a specific env var for CUDA lib path (like TF_CUDA_PATHS)
+
+Let me check option 1: modify the kernel spec.
+
+<------------Start Output / 13:42------------>
+Updated kernel.json with LD_LIBRARY_PATH in env block. User needs to restart kernel and test Cell 1.
+
+<------------Start User / 13:45------------>
+Still no GPU after kernel.json update. Same dlopen error. Need deeper diagnosis.
+
+<------------Start Thinking / 13:45------------>
+Three attempts failed: os.environ in cell, os.environ before import, kernel.json env. All set LD_LIBRARY_PATH but TF still can't find GPU libs.
+
+Possible causes:
+1. TF 2.21 uses a different mechanism to find CUDA libs (not LD_LIBRARY_PATH)
+2. There's a missing library that's not in the nvidia pip packages
+3. The kernel might not be picking up the updated kernel.json (need to verify)
+
+Let me get more specific: TF says "Cannot dlopen some GPU libraries" but which ones? Need to enable verbose logging or check what specific library is failing. Let me have the user run TF with debug logging to see which dlopen call fails.
+
+LD_LIBRARY_PATH IS set (kernel.json worked). So the env var is there but TF still can't load. The verbose logging didn't print anything useful. Let me try a different approach: manually load the libs TF needs and see which one fails. Or check the TF 2.21 source for what libs it tries to dlopen.
+
+Actually, let me try something simpler: check if there's a libcuda.so (the driver stub) available. TF needs libcuda.so.1 from the driver, not just the runtime libs. On WSL2, this should be at /usr/lib/wsl/lib/ or similar.
+
+Also, TF 2.21 might need specific CUDA toolkit libs that aren't in the pip packages (like libcupti). Let me check what's actually missing by trying to load each critical lib.
+
+Found the culprits: libcusolver.so.11 and libnvjitlink.so.12 fail to load. All others OK. Let me check what's actually in those pip package lib dirs — maybe versioned differently.
+
+Files exist! cusolver.so.11 loads fine with full path. nvJitLink has case mismatch: file is libnvJitLink.so.12 (camelCase), TF looks for libnvjitlink.so.12 (lowercase). Both load with full paths.
+
+The issue: LD_LIBRARY_PATH is set and the dirs are correct, but dlopen by short name fails for these two. cusolver loads fine by full path but not by short name — could be a dependency issue (cusolver depends on other libs that aren't found).
+
+Root cause confirmed: libnvJitLink.so.12 (camelCase) vs TF expects libnvjitlink.so.12 (lowercase). Created symlink. cusolver was a red herring — it works fine when LD_LIBRARY_PATH is properly set from the shell level (kernel.json).
+
+<------------Start Output / 13:52------------>
+Symlink created. User should restart kernel and test Cell 1.
+
+<------------Start User / 13:57------------>
+Still failing after symlink + kernel restart. Same error.
+
+<------------Start Thinking / 13:57------------>
+The symlink fixed the nvjitlink case issue, but still no GPU. Need to think differently.
+
+Terminal test worked perfectly with LD_LIBRARY_PATH set as a shell variable before python. The notebook kernel.json has LD_LIBRARY_PATH set and we confirmed it's visible in the notebook. But TF still can't dlopen.
+
+Wait — in the notebook diagnostic, ctypes couldn't find libcusolver.so.11 by short name, but in the terminal with LD_LIBRARY_PATH it worked. Maybe the kernel.json env isn't being picked up after all? Or VS Code's jupyter extension might not respect the kernel.json env field.
+
+Let me check: does the notebook process actually have LD_LIBRARY_PATH? The earlier diagnostic showed it was set. But maybe it's set in the Python process but the dynamic linker ldconfig cache doesn't have these paths.
+
+Actually wait — TF might use dlopen with RTLD_NOW which checks transitive dependencies. cusolver depends on cublas which depends on nvjitlink... the dependencies form a chain. If any single lib in the chain can't be found, the whole thing fails.
+
+Alternative approach: instead of LD_LIBRARY_PATH, use the nvidia_tensorflow plugin approach, or set the paths via ldconfig, or try a completely different method.
+
+Actually, let me check how the computer_vision project's venv works. It has the same packages and works. What's different? Maybe the TF version — computer_vision uses 2.20, we use 2.21. TF 2.21 might have changed the CUDA loading mechanism.
+
+Or simpler: maybe TF 2.21 needs an additional package like tensorflow[and-cuda] or nvidia-cuda-nvcc-cu12.
+
+TF 2.21 build info: cuda_version='12.5.1', cudnn_version='9'. But we installed CUDA 12.9 packages. TF was built against CUDA 12.5, so it expects libcudart.so.12, libcublas.so.12 etc — those should be compatible (same major version). But maybe there's a specific minor version issue.
+
+Actually, I wonder if the problem is simpler: the kernel.json env might not be picked up by the VS Code Jupyter extension. Let me try a completely different approach: use TF's own CUDA path mechanism or install tensorflow[and-cuda].
+
+ctypes.CDLL preload with RTLD_GLOBAL worked! VS Code Jupyter ignores kernel.json env field. The fix: preload all nvidia .so files before importing TF. User updated Cell 1 with the preload block.
+
+<------------Start Output / 14:02------------>
+GPU working. Cell 1 updated with ctypes preload approach. User should now rerun all cells through Cell 11 for GPU-accelerated training.
+
+<------------Start User / 14:05------------>
+User wants to document the CUDA setup and inform DSM central.
+
+<------------Start Thinking / 14:05------------>
+Two deliverables:
+1. ~/gpu-setup.md — central guide for all projects (agreed earlier)
+2. DSM feedback — document the issue for DSM central
+
+<------------Start Output / 14:10------------>
+All three documents written:
+1. ~/gpu-setup.md — central GPU setup guide (pip packages, symlink, ctypes preload, troubleshooting)
+2. dsm-docs/feedback-to-dsm/2026-04-04_s4_cuda-setup-pitfalls.md — DSM feedback on the 4 pitfalls
+3. Memory reference saved: reference_gpu_setup.md → ~/gpu-setup.md
+
+<------------Start User / 14:18------------>
+Cell 11 output shared. GPU IS working (XLA logs show "Quadro T1000 with Max-Q Design", cuDNN 91700 loaded). Cell 1 prints "No GPU detected" because the ctypes preload happens but TF's physical device list is checked before XLA initializes. The GPU IS being used though — 3.8 min training time confirms this (CPU would have been 10+ min).
+
+Results:
+- 153,382 total params (152,934 trainable) — matches evidence estimate of ~153K
+- Early stopping at epoch 20, restored to epoch 15
+- Best val accuracy: 22.79%, best val loss: 3.4113
+- LR reduced twice: 1e-3 → 5e-4 → 2.5e-4
+- Train accuracy ~26% at stop vs val 22.8% — small gap, model is underfitting (not overfitting as much as expected)
+- 22.8% on 102 classes is ~23x random (0.98%), so the model learned something but is limited
+
+The "No GPU detected" message is misleading — Cell 1 needs a fix. But the training used GPU.
+
+<------------Start Thinking / 14:18------------>
+Two things to address:
+1. Cell 1 prints "No GPU detected" but GPU IS being used (XLA confirms). The issue: ctypes preload loads the libs into the process, but TF's list_physical_devices might need to be called after some initialization. Actually looking more carefully — the print says "No GPU detected" but then the XLA log says GPU is initialized. This means TF registers the GPU AFTER the initial check. The memory_growth setting in Cell 1 didn't run. This could be a problem (OOM without memory growth on 4GB card).
+
+Actually wait — Cell 1 said "No GPU detected — training will be slow" but training used GPU at 10s/epoch. The GPU was detected LATER during model.fit, not during list_physical_devices in Cell 1. This is a timing issue with the ctypes approach.
+
+Need to fix Cell 1 so GPU is properly detected at check time. Maybe add a small TF operation to force GPU initialization before the check.
+
+2. Training results analysis for the user.
+
+Let me address the Cell 1 GPU detection issue first, then analyze results.
+
+<------------Start User / 14:22------------>
+User asks "what happened?" — likely about why Cell 1 says no GPU but GPU was used.
+
+<------------Start Thinking / 14:22------------>
+The user wants to understand the discrepancy. Let me explain clearly.
+
+<------------Start Output / 14:24------------>
+Explained lazy GPU init. User approved generating updated Cell 1.
+
+<------------Start Thinking / 14:24------------>
+Need to force TF GPU initialization before the device check. Options:
+- tf.config.experimental.reset_memory_stats() — might not trigger init
+- Create a small tensor on GPU — forces CUDA init
+- Call tf.config.list_physical_devices() after a small tf operation
+
+Actually the simplest: after importing TF, do a tiny operation that forces GPU discovery, like tf.zeros([1]) or just calling tf.config.experimental.list_physical_devices after ensuring libs are loaded.
+
+Wait — there might be a simpler approach. The issue is that ctypes.CDLL loads libs into the process, but TF's plugin system may need to be explicitly triggered. Let me check if there's an env var like NVIDIA_TF32_OVERRIDE or TF_FORCE_GPU_ALLOW_GROWTH.
+
+Actually, the cleanest fix: after ctypes preload and TF import, call tf.config.list_physical_devices('GPU') — if empty, try creating a small tensor to force init, then re-check. Or set TF_FORCE_GPU_ALLOW_GROWTH=true as env var before import (handles memory growth without needing the explicit call).
+
+Let me keep it simple: set TF_FORCE_GPU_ALLOW_GROWTH=true env var before import (handles memory growth), and after import do a tiny tf.constant to trigger CUDA init, then check devices.
+
+<------------Start Output / 14:30------------>
+Cell 1 fix works. GPU detected: Quadro T1000, 2248 MB memory, memory growth enabled via env var. Cell 1 now correctly reports GPU available.
+
+<------------Start User / 14:35------------>
+User requests lightweight wrap-up.
+
+<------------Start Thinking / 14:35------------>
+Lightweight wrap-up steps:
+1. MEMORY.md — update session line
+2. Feature branch safety push — check if unpushed
+3. Git commit + push — stage all, commit
+4. Checkpoint — create minimal checkpoint
+5. Baseline mode marker — append mode: light
+6. Checkpoint commit + push
+
+Session 4 summary: Evidence step added to what/why/how (CLAUDE.md + DSM feedback), figure validation rule (CLAUDE.md + DSM feedback), CUDA/GPU setup resolved (4 pitfalls: pip packages, nvJitLink symlink, VS Code kernel.json ignored, ctypes preload + lazy init), central GPU guide (~/gpu-setup.md), baseline CNN trained (22.8% val accuracy, 153K params, GPU confirmed working). Cell 1 updated with GPU preload fix.
+
+Let me check git state first.
