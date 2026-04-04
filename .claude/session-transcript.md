@@ -1537,3 +1537,15 @@ Summary: Phase 3 complete (baseline test eval), Phase 4 complete (EfficientNetB0
 Step 1: MEMORY.md updated (session 5 line).
 Step 2: No remote, push skipped.
 Step 3: Committing session changes.
+Step 3: Committed 32f74bf.
+Step 4: Checkpoint written.
+Step 5: Baseline mode marker written.
+Step 6: Checkpoint commit.
+
+<------------Start Output / 18:30------------>
+Lightweight wrap-up complete:
+- MEMORY.md updated (session 5 line)
+- Committed: 32f74bf (session work)
+- No remote configured, push skipped
+- Checkpoint: dsm-docs/checkpoints/2026-04-04_s5_transfer-learning-complete.md
+- Baseline: mode: light preserved for next /dsm-light-go
