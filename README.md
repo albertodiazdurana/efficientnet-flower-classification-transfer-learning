@@ -11,8 +11,6 @@ Deep learning and AI portfolio projects, built with a structured methodology.
 
 Transfer learning with EfficientNetB0 for 102-class flower species identification.
 
-**Status:** Sprint 1 complete
-
 ### Results
 
 | Model | Test Accuracy | Macro F1 | Parameters | Training Time |
