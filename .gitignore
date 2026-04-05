@@ -26,3 +26,6 @@ tensorflow_datasets/
 *.h5
 *.keras
 saved_models/
+
+# Claude Code local state
+.claude/

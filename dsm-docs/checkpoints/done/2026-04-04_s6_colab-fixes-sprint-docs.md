@@ -1,3 +1,5 @@
+**Consumed at:** Session 7 start (2026-04-05)
+
 # Checkpoint — Session 6: Colab Fixes & Sprint Boundary Docs
 
 **Date:** 2026-04-04

@@ -1,8 +1,0 @@
-# Session baseline - 2026-04-04T22:45:00+02:00
-# Session branch
-session-1/2026-04-03
-# HEAD commit
-7f42ab5
-# Working tree
-clean
-mode: light
