@@ -1,6 +1,6 @@
 # Advanced DS and AI Portfolio Projects
 
-Deep learning and AI portfolio projects, built with a structured methodology (DSM 0.2).
+Deep learning and AI portfolio projects, built with a structured methodology.
 
 ## Author
 
