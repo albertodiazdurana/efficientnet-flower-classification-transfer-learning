@@ -1,17 +1,13 @@
-# Advanced DS and AI Portfolio Projects
+# EfficientNet Flower Classification (Transfer Learning)
 
-Deep learning and AI portfolio projects, built with a structured methodology.
+102-class flower species classification using EfficientNetB0 transfer learning on the Oxford Flowers 102 dataset.
 
 ## Author
 
 **Alberto Diaz Durana**
 [GitHub](https://github.com/albertodiazdurana) | [LinkedIn](https://www.linkedin.com/in/albertodiazdurana/)
 
-## Flower Classification (Oxford Flowers 102)
-
-Transfer learning with EfficientNetB0 for 102-class flower species identification.
-
-### Results
+## Results
 
 | Model | Test Accuracy | Macro F1 | Parameters | Training Time |
 |-------|--------------|----------|------------|---------------|
@@ -25,18 +21,18 @@ Transfer learning with EfficientNetB0 for 102-class flower species identificatio
 
 ![Baseline vs Transfer Learning](notebooks/outputs/figures/evaluation/s01_d01_baseline_vs_transfer.png)
 
-### Error Analysis
+## Error analysis
 
 The model's worst errors are between flowers that share color and petal shape.
 
 ![Most-Confused Pairs](notebooks/outputs/figures/evaluation/s01_d01_confused_pairs_visual.png)
 
-### Run the Notebook
+## Run the notebook
 
-**Option A — Google Colab (recommended):**
+**Option A, Google Colab (recommended):**
 Upload `notebooks/flower-classification.ipynb` to Colab, select T4 GPU runtime, and run all cells.
 
-**Option B — Local:**
+**Option B, local:**
 ```bash
 python -m venv .venv
 source .venv/bin/activate
@@ -50,7 +46,7 @@ Requires a CUDA-compatible GPU (tested on Quadro T1000, 4GB VRAM).
 ## Folder Structure
 
 ```
-Advanced-DS-and-AI-Portfolio-Projects/
+efficientnet-flower-classification-transfer-learning/
 ├── notebooks/                  # Jupyter notebooks (main deliverables)
 │   └── outputs/
 │       ├── figures/            # Saved plots from notebook cells
