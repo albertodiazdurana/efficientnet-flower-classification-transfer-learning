@@ -16,16 +16,18 @@ Transfer learning with EfficientNetB0 for 102-class flower species identificatio
 | Model | Test Accuracy | Macro F1 | Parameters | Training Time |
 |-------|--------------|----------|------------|---------------|
 | Baseline CNN | 24.56% | 0.1984 | 153K | 5.6 min |
-| EfficientNetB0 (transfer) | **89.27%** | **0.8914** | 4.18M | 9.9 min |
+| EfficientNetB0 (transfer) | 91.01% | 0.9072 | 4.18M | 8.7 min |
+| + Test-Time Augmentation | **91.90%** | **0.9175** | 4.18M | +1.1 min inference |
 
 - 3-phase progressive fine-tuning: head-only, top 30% unfreeze, full fine-tune
 - Trained on 1,734 images (~10 per class), evaluated on 6,149 test images
+- TTA: 5 augmented views (original, h-flip, ±90° rotation, center crop), averaged softmax
 
 ![Baseline vs Transfer Learning](notebooks/outputs/figures/evaluation/s01_d01_baseline_vs_transfer.png)
 
 ### Error Analysis
 
-Detailed analysis of the model's most-confused flower pairs reveals that errors concentrate on visually similar species (shared petal shape and color).
+The model's worst errors are between flowers that share color and petal shape.
 
 ![Most-Confused Pairs](notebooks/outputs/figures/evaluation/s01_d01_confused_pairs_visual.png)
 
@@ -50,7 +52,9 @@ Requires a CUDA-compatible GPU (tested on Quadro T1000, 4GB VRAM).
 ```
 Advanced-DS-and-AI-Portfolio-Projects/
 ├── notebooks/                  # Jupyter notebooks (main deliverables)
-│   └── outputs/figures/        # Saved plots from notebook cells
+│   └── outputs/
+│       ├── figures/            # Saved plots from notebook cells
+│       └── *.weights.h5        # Cached model weights (gitignored)
 ├── dsm-docs/                   # DSM methodology artifacts
 │   ├── plans/                  # Sprint plans
 │   ├── research/               # Research notes

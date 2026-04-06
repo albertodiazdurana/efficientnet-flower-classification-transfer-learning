@@ -1,8 +1,8 @@
 # Sprint 1 Decision Log
 
 **Sprint:** 1 — EDA, Baseline & Transfer Learning
-**Date range:** 2026-04-03 to 2026-04-04
-**Sessions:** 1-6
+**Date range:** 2026-04-03 to 2026-04-06
+**Sessions:** 1-8
 
 ---
 
@@ -41,3 +41,21 @@
 **Context:** Phases 4b and 4c use CosineDecay LR schedules. ReduceLROnPlateau was included in callbacks.
 **Decision:** Removed ReduceLROnPlateau from 4b (Colab fix) and 4c (during session 5).
 **Rationale:** ReduceLROnPlateau modifies the optimizer's LR, which conflicts with schedule-based LR. The schedule already handles decay. Keeping both causes unpredictable LR behavior.
+
+### DEC-007: Automatic 4c rollback with weight checkpointing
+
+**Context:** Session 8 re-ran 4a+4b+4c with weight saving after each phase. 4c degraded again (92.16% → 88.97%, -3.19pp) even with 10x gentler LR (1e-6 vs 1e-5).
+**Decision:** Cell 19 saves 4b weights before 4c, automatically restores if 4c degrades. 4c weights file stores the rolled-back state to skip retraining on re-runs.
+**Rationale:** Full fine-tuning consistently hurts on this dataset size. The rollback makes the notebook safe to run end-to-end without manual intervention. Supersedes DEC-005.
+
+### DEC-008: Keep augmentation despite head-only penalty
+
+**Context:** Controlled experiment showed augmentation reduces val accuracy by -4.90pp at head-only stage (frozen backbone, 10 epochs).
+**Decision:** Keep augmentation in the training pipeline for all phases.
+**Rationale:** The penalty only appears when the backbone is frozen and cannot adapt to augmented inputs. During Phase 4b (partial unfreeze), augmentation provides the variety needed to generalize. Removing it would optimize for 4a at the expense of 4b.
+
+### DEC-009: TTA with 5 views (no vertical transforms)
+
+**Context:** Chose TTA views for inference-time accuracy boost.
+**Decision:** 5 views: original, horizontal flip, +90°, -90°, center crop (85%).
+**Rationale:** Flowers have natural upright orientation, so vertical flips are excluded (consistent with training augmentation). 90° rotations help with varied camera angles. Center crop focuses on the flower subject. Result: +0.89pp accuracy for 1.1 min inference cost.
