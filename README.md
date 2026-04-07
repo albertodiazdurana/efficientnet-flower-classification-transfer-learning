@@ -2,6 +2,8 @@
 
 102-class flower species classification using EfficientNetB0 transfer learning on the Oxford Flowers 102 dataset.
 
+**Status:** Complete (archived 2026-04-07). Sprint 1 closed at 91.90% test accuracy with TTA. No further sprints planned.
+
 ## Author
 
 **Alberto Diaz Durana**
