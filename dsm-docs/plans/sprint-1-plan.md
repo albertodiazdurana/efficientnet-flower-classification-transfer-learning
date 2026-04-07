@@ -1,5 +1,7 @@
 # Sprint 1: EDA, Baseline & Transfer Learning
 
+> **Status (2026-04-07): Project finalized.** Sprint 1 closed at 91.90% test accuracy (TTA, gate was 90%). **Sprint 2 will not take place.** This project is archived as a portfolio deliverable; no further sprints are planned.
+
 **Goal:** Deliver a trained transfer-learning model on Oxford Flowers 102 that exceeds 90% test accuracy, with documented EDA and baseline comparison.
 **Prerequisites:** Local Python environment with TensorFlow, TFDS accessible
 **Development environment:** Local development and training (Quadro T1000 4GB VRAM). Notebook kept Colab-compatible for portfolio reviewers. Fall back to Colab for larger backbones (B3+) if local VRAM insufficient.
@@ -138,7 +140,7 @@ Sprint branch: `sprint-1/eda-baseline-transfer` off `main`.
 
 ## Open Design Questions
 1. Does TFDS `oxford_flowers102` expose train/val/test or only train/test in the current version?
-2. Should we save the trained model (SavedModel format) for potential Sprint 2 deployment work?
+2. Should we save the trained model (SavedModel format)? (Resolved: not pursued, project finalized after Sprint 1.)
 3. Class weights vs. oversampling -- which to try first given the merged training set?
 
 ---
